@@ -1,58 +1,51 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Creando un paquete de R para un curso de estadística"
+author: "Mauricio G. Tec"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{crear_paquete}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+## Objetivo
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
+Este documento describe la sencilla tarea de crear un paquete de R y documentarlo. Este proceso es muy fácil y se logra utilizando el paquete `devtools` de R.
 
-## Vignette Info
+El paquete se usará para distribuir los materiales del curso de maestría *Métodos Multivariados en Ciencias de Datos y Estadística* impartido en el Instituto Tecnológico Autónomo de México en la primavera de 2017. 
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+En realidad, estos tutoriales deben ser últiles para cualquiera interesado en crear un paquete, no solo estudiantes de la clase. Existen muchos materiales y referencias en Internet, el objetivo secundario es generar más contenido en español.
 
-## Styles
+## Prerequisitos
+Tener `R` instalado y el paquete `devtools`. Si están en Windows, necesitarán adicionalmente instalar `Rtools`, que se descarga como un instalable de la página principal de R. Se recomienda usar `Rstudio` por comodidad pero no es necesario.
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+## Crear el esqueleto del paquete
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+Lo primero que tenemos que hacer es crear la estructura del paquete. Para entender a fondo lo que vamos a hacer recomiendo dar una lectura rápida a
 
-## Figures
++ [Documentación de R (Writing R extensions)](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
++ [Documentación de R Studio:](https://www.google.com.mx/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&cad=rja&uact=8&ved=0ahUKEwiW957hy8zRAhULxLwKHYbKAFIQFggrMAI&url=https%3A%2F%2Fsupport.rstudio.com%2Fhc%2Fen-us%2Farticles%2F200486488-Developing-Packages-with-RStudio&usg=AFQjCNEaqKt4dLYm2gP4UxyuUy5MxWMDPQ)
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+Para crear la estructura del paquete lo único que tienes que hacer es establecer el directorio de trabajo en la carpeta que contendrá el paquete (puedes usar `setwd` o la interfaz de `Rstudio`) y correr el siguiente comando
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r, eval = FALSE}
+devtools::create(path = "metodosMultivariados2017") 
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+En el código anterior puedes cambiar "metodosMultivariados2017" por el titulo de tu paquete.
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+Con esto se creará una carpeta en el directorio de trabajo llamada "metodosMultivariados2017" con dos archivos DESCRIPTION y NAMESPACE y una subcarpeta R donde guardaremos las funciones que estarán en el paquete. 
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
 ```
+metodosMultivariados2017/ 
+  |-- metodosMultivariados2017.Rproj
+  |-- DESCRIPTION
+  |-- NAMESPACE
+  |-- R/
+```
+Si están en Rstudio y saben usar proyectos, notarás que se creó un proyecto en la carpeta con el mismo nombre del paquete, deberán abrirlo y automáticamente el directorio de trabajo será el del paquete y Rstudio habilitará las herramientas de desarrollo. Si no están en Rstudio, deberán cambiar nuevamente el directorio de trabajo a la carpeta recien creada.
 
-Also a quote using `>`:
+Necesitamos entender como funciona cada uno de los archivos creados para el paquete. El más complicado de entender es el NAMESPACE, y es el que hace la creación de paquetes difícil. Afortunadamente, el equipo de Rstudio desarrolló otro paquete que hace "magia" y jamás tendremos que tocar este archivo, solamente DESCRIPTION.
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
