@@ -1,4 +1,7 @@
- Métodos Multivariados en Ciencias de Datos y Estadística
+
+
+
+Métodos Multivariados en Ciencias de Datos y Estadística
 ## Instituto Tecnológico Autónomo de México
 ### Primavera 2017
 
@@ -48,4 +51,19 @@ La evaluación tentativa será de la siguiente forma:
 Las presentaciones de la clase pueden consultarse en [este link dentro del repositorio](https://github.com/mauriciogtec/metodosMultivariados2017/materiales_del_curso/presentaciones)
 
 
+## Tareas individuales
+
+Habrá tareas individuales todas las clases, los detalles de la forma de entrega se discutirán en clase. Usualmente no pasará de un reporte en una página o participación en la clase. Incluyo aquí una lista no detallada para que revisen si están al corriente
+
+*Lista de tareas individuales*
+
+1. Investigar y ejemplificar cómo se representan cada tipo de dato estadístico en R
+
+## Tareas grupales
+
+Son el corazón del curso. Cada clase uno o dos grupos tendrá una tarea que involucrará programación y explicación de su material en la clase. Los detalles los dicutiré cada semana con cada grupo.
+
+*Lista de tareas grupales*
+
+1. Investigar escalas de medición para cada tipo de dato estadístico y cómo se miden distancias entre ellos. Crear un rmarkdown html y exponerlo en clase
 
