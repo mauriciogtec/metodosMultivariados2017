@@ -25,7 +25,7 @@ browseVignettes("metodosMultivariados2017")
 
 ## Temario del curso
 
-Detalles en el temario pueden ir cambiando conforme avancemos, pero el propósito general puede consultarse [este link](https://github.com/mauriciogtec/metodosMultivariados2017/materiales_clase/temario.pdf).
+Detalles en el temario pueden ir cambiando conforme avancemos, pero el propósito general puede en consultarse [este link](https://github.com/mauriciogtec/metodosMultivariados2017/blob/master/materiales_clase/temario.pdf). Habrá cambios importantes en las primeras dos semanas de clase.
 
 ## Definición de equipos
 
@@ -48,7 +48,7 @@ La evaluación tentativa será de la siguiente forma:
 
 ## Materiales del curso
 
-Las presentaciones de la clase pueden consultarse en [este link dentro del repositorio](https://github.com/mauriciogtec/metodosMultivariados2017/materiales_clase/presentaciones)
+Las presentaciones de la clase pueden consultarse en [este link dentro del repositorio](https://github.com/mauriciogtec/metodosMultivariados2017/tree/master/materiales_clase/presentaciones)
 
 
 ## Tareas individuales
