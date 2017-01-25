@@ -22,7 +22,7 @@ browseVignettes("metodosMultivariados2017")
 
 ## Temario del curso
 
-Detalles en el temario pueden ir cambiando conforme avancemos, pero el propósito general puede consultarse [este link](https://github.com/mauriciogtec/metodosMultivariados2017/materiales_del_curso/temario.html).
+Detalles en el temario pueden ir cambiando conforme avancemos, pero el propósito general puede consultarse [este link](https://github.com/mauriciogtec/metodosMultivariados2017/materiales_del_curso/temario.pdf).
 
 ## Definición de equipos
 
