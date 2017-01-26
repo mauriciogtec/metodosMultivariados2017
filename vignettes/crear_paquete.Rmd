@@ -192,13 +192,13 @@ Ahora veamos si la ayuda de la función `timesTwo` y de nuestro paquete
 help(package = "metodosMultivariados2017")
 ```
 
-![](crear_paquete/help_package.png)
+![](crear_paquete/help_package.PNG)
 
 ```{r, eval = FALSE}
 help(timesTwo)
 ```
 
-![](crear_paquete/help_timesTwo.png)
+![](crear_paquete/help_timesTwo.PNG)
 
 #### Las modificaciones hechas por roxygen2
 
