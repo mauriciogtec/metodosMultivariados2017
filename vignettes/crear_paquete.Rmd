@@ -71,7 +71,7 @@ LazyData: true
 ```
 Debemos cambiar el título, versión, autor y descripción del paquete, pueden asimismo incluir una licencia. Las entradas de `Encoding` y `LazyData` pueden quedarse como están.
 
-El campo `Depends` es el más dificil de difícil de entender. Su función es controlar el sistema de dependencias, es decir, incluir aquellos paquetes necesarios para que nuestro paquete sirva. El problema es que con el tiempo, la manera oficial recomendada por el equipo de R de trabajar las dependencias ha ido cambiando con el tiempo y hoy en día se recomienda dejar intacto el campo`Depends` y agregar en cambio un nuevo campo llamado `Imports` que por el momento estaría vacío.  En el campo `Imports` debemos listar todos los paquetes que deben ser instalados justo con nuestra paquetería. El archivo DESCRIPTION deberá por lo tanto quedar como sigue.
+El campo `Depends` es el más dificil de difícil de entender. Su función es controlar el sistema de dependencias, es decir, incluir aquellos paquetes necesarios para que nuestro paquete sirva. El problema es que con el tiempo, la manera oficial recomendada por el equipo de R de trabajar las dependencias ha ido cambiando con el tiempo y hoy en día se recomienda dejar intacto el campo `Depends` y agregar en cambio un nuevo campo llamado `Imports` que por el momento estaría vacío.  En el campo `Imports` debemos listar todos los paquetes que deben ser instalados justo con nuestra paquetería. El archivo DESCRIPTION deberá por lo tanto quedar como sigue.
 
 ```yaml
 Package: metodosMultivariados2017
@@ -192,13 +192,13 @@ Ahora veamos si la ayuda de la función `timesTwo` y de nuestro paquete
 help(package = "metodosMultivariados2017")
 ```
 
-![](crear_paquete/help_package.png)
+![](crear_paquete/help_package.PNG)
 
 ```{r, eval = FALSE}
 help(timesTwo)
 ```
 
-![](crear_paquete/help_timesTwo.png)
+![](crear_paquete/help_timesTwo.PNG)
 
 #### Las modificaciones hechas por roxygen2
 
