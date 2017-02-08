@@ -21,6 +21,7 @@ Para ver los vignettes:
 
 ```r
 browseVignettes("metodosMultivariados2017")
+
 ```
 
 ## Temario del curso
@@ -58,6 +59,7 @@ Habrá tareas individuales todas las clases, los detalles de la forma de entrega
 *Lista de tareas individuales*
 
 1. Investigar y ejemplificar cómo se representan cada tipo de dato estadístico en R
+2. Investigar sobre el Teorema Espectral para matrices simétricas ý cómo visualizar los eingenvalores de la matriz de covarianzas de una nube de datos. Para más detalles ver la presentación 2 del curso.
 
 ## Tareas grupales
 
@@ -66,4 +68,5 @@ Son el corazón del curso. Cada clase uno o dos grupos tendrá una tarea que inv
 *Lista de tareas grupales*
 
 1. Investigar escalas de medición para cada tipo de dato estadístico y cómo se miden distancias entre ellos. Crear un rmarkdown html y exponerlo en clase
+2. Mostrar una aplicación práctica de Análisis de Componentes Principales. Mostrar todos los elementos de un análisis.
 
