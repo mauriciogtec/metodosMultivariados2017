@@ -16,7 +16,7 @@ vignette: >
 
 ## ¿De qué es este tutorial?
 
-Esta es una guía para crear un paquete de R y documentarlo de manera práctica y sencilla. Cualquier persona con conocimiento basico de R puede crear su paquete gracias al paquete `devtools` creado por el equipo de R y RStudio en conjunto.
+Esta es una guía para crear un paquete de R y documentarlo de manera práctica y sencilla. Cualquier persona con conocimiento básico de R puede crear su paquete gracias al paquete `devtools` creado por el equipo de R y RStudio en conjunto.
 
 Como ejemplo, voy a crear un paquete llamado *metodosMultivariados2017*, que usaré este semestre en el curso de maestría *Métodos Multivariados en Ciencias de Datos y Estadística* impartido en el Instituto Tecnológico Autónomo de México (ITAM) en la primavera de 2017. 
 
