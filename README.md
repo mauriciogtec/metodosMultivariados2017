@@ -81,6 +81,6 @@ Son el corazón del curso. Cada clase uno o dos grupos tendrá una tarea que inv
 
 1. Hacer un análisis de MDS siguiendo los pasos de la clase del 1 de marzo 
 2. Mostrar todos los detalles del algoritmo con claridad (matriz de disimilitudes, doble centrar, descomposición espectral, aproximación de coordenadas principales, calidad de la aproximación, visualización, etc.)
-3. Escoger datos de los cuales puedan concluir algo interesante. Yo propongo los datos del senado de la paquetería y combinar con el partido de cada senador *(usar `data(senadores_votaciones)` y `data(senadores_partidos)` para cargar los datos. Si tienen dudas del significado de las claves de notaciones ver `help(senadores_votaciones)` despues de cargar los datos)*. Si tienen datos alternativos de los cuales quieran hacer MDS por razones especiales, pueden hacerlo siempre y cuando concluyan algo sobre los datos también.
+3. Escoger datos de los cuales puedan concluir algo interesante. Yo propongo los datos del senado de la paquetería y combinar con el partido de cada senador *(usar `data(senado_votacion)` y `data(senado_partidos)` para cargar los datos. Si tienen dudas del significado de las claves de notaciones ver `help(senadores_votaciones)` despues de cargar los datos)*. Si tienen datos alternativos de los cuales quieran hacer MDS por razones especiales, pueden hacerlo siempre y cuando concluyan algo sobre los datos también.
 4. Su tarea tienen que tener un párrafo de conclusiones, tanto del método como de sus datos.
 
