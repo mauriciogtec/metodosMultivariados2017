@@ -21,4 +21,3 @@ multiplicado por cuatro. La documentacion de ayuda es generada usando roxygen2. 
 timesFour(3)
 timesFour(0:10)
 }
-
