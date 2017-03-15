@@ -1,0 +1,90 @@
+---
+title: "Creando vignettes"
+author: "Mauricio Garcia Tec"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Crear vignettes}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Las viñetas son una forma cómoda y práctica de documentar paquetes a través de ejemplos o tutoriales. Las viñetas se pueden construir facilmente usando `rmarkdown` y `devtools`.
+
+El primer paso para hacer una viñeta es abrir nuestro paquete con el directorio de trabajo en la carpeta principal y usar la opción:
+
+```{r, eval=FALSE}
+devtools::use_vignette("<vignette_name>")
+```
+
+Una vez hecho esto, se creara el archivo `<vignette_name>.Rmd` en la dirección:
+
+```
+<package_name>/
+  |-- vignettes/
+  |--   |-- <vignette_name>.Rmd
+```
+
+A continuación debemos abrir el archivo creado, que se trata de un `rmarkdown` en HTML convencional con algunas excepciones.
+
+1. **El header yaml**
+
+El tipo de output declarado en el header es `output: rmarkdown::html_vignette` a diferencia de las opcion convencional `output: rmarkdown::html_document` al crear un `rmarkdown` en html. Esta opcion lo que hace es darle el formato y estilo adecuado al html.
+
+Este tipo de documento tiene las principales diferencias técnicas
+
+- El tamaño de las imagenes no es dinámico y es de menor tamaño por default
+- No usa el estilo Twitter Bootstrap de CSS
+
+
+2. **Macros para crear entradas de viñetas en la paqueteria**
+
+El header debe contener las siguientes entradas 
+
+```
+vignette: >
+  %\VignetteIndexEntry{<vignette_name>}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+```
+donde hay que sustituir `<vignette_name>` por el nombre de nuestra viñeta. El objtivo de estos comandos es garantizar que al momento de construir la viñeta se agreguen entradas apropiadas en la documentación del paquete. 
+
+#### Construcción de la viñeta
+
+Las viñetas se construiran automáticamente cuando instalemos el paquete una vez subido al CRAN. Sin embargo, en un ambiente de pruebas debemos usar un comando adicional, por ejemplo:
+
+```{r, eval = FALSE}
+devtools::build_vignettes()
+devtools::install()
+```
+ o 
+ 
+ 
+```{r, eval = FALSE}
+devtools::install_github("user/repo", build_vignettes = TRUE)
+```
+
+#### Navegar las vignettes
+
+Una vez instalado un paquete, las vignettes pueden explorarse con el comando
+
+```{r, eval = FALSE}
+browseVignettes(package = "<package_name>")
+```
+
+
+#### Si ya tenian un markdown html y quieren agregarlo como vignette
+
+En este caso lo único que tenemos que hacer es 
+
+i. Incluir el archivo `.Rmd` en la carpeta `vignettes/` del paquete (crearla si no existe), y y remover la o
+ii. Remover la línea output: `rmarkdown::html_document` del header y agregar las líneas
+
+```
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+```
+

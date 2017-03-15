@@ -21,4 +21,3 @@ multiplicado por dos. La documentacion de ayuda es generada usando Roxygen2.
 timesTwo(3)
 timesTwo(0:10)
 }
-
