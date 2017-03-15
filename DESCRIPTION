@@ -6,9 +6,12 @@ Description: What the package does (one paragraph).
 Depends:
     R (>= 3.2.3)
 LazyData: true
-Imports: magrittr
+Imports: 
+  magrittr
 Suggests:
-    knitr,
-    rmarkdown
+  knitr,
+  rmarkdown,
+  ggplot2,
+  ggtern
 VignetteBuilder: knitr
 RoxygenNote: 6.0.1
