@@ -1,0 +1,95 @@
+---
+title: "Analisis de Correspondencias"
+author: "Mauricio Garcia Tec"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Analisis de Correspondencias}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, results ='hide'}
+library(metodosMultivariados2017)
+library(datasets)
+library(knitr)
+```
+
+```{r}
+data("HairEyeColor")
+tbl <- apply(HairEyeColor, c(1,2), sum)
+dimnames(tbl) <- list(paste(dimnames(tbl)[[1]], "Hair"),
+                      paste(dimnames(tbl)[[2]], "Eyes"))
+kable(tbl)
+```
+
+```{r}
+X <- metodosMultivariados2017::contingency_dummies(tbl)[[1]]
+Y <- metodosMultivariados2017::contingency_dummies(tbl)[[2]]
+```
+
+```{r}
+kable(t(X) %*% Y)
+```
+
+```{r}
+Dr = t(X) %*% X
+kable(Dr)
+```
+
+
+```{r}
+Dc = t(Y) %*% Y
+kable(Dc)
+```
+
+## Row profiles
+
+```{r}
+Dr_inv <- diag(1/diag(Dr))
+dimnames(Dr_inv) <- dimnames(Dr)
+Pr <-  Dr_inv %*% t(X) %*% Y
+kable(Pr)
+```
+
+Que tan diferentes son las filas una de otra?
+
+El individuo promedio o esperado:
+
+
+```{r}
+N <-  sum(as.numeric(tbl))
+c <-  diag(Dc / N) # typical col
+c 
+```
+
+Diferencia del perfil de fila con el individuo esperado:
+
+```{r}
+ones_cols <-  rep(1, length(c))
+Pr_centred <- Pr - ones_cols %*% t(c) 
+kable(Pr_centred)
+```
+
+Cuanto suman las filas de la matriz? QUe mas podemos decir de esta matriz?
+
+
+```{r}
+c <-  diag(Dc / N)
+r <-  diag(Dr / N)
+expected <- N * r %*% t(c)
+kable(expected)
+```
+
+
+
+```{r}
+kable(tbl - expected)
+```
+
+
+```{r}
+X_tilde <- scale(X, center = TRUE, scale = FALSE)
+Y_tilde <- scale(Y, center = TRUE, scale = FALSE)
+t(X_tilde) %*% Y_tilde
+```
