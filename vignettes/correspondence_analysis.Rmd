@@ -24,72 +24,212 @@ kable(tbl)
 ```
 
 ```{r}
-X <- metodosMultivariados2017::contingency_dummies(tbl)[[1]]
-Y <- metodosMultivariados2017::contingency_dummies(tbl)[[2]]
+X <- contingency_dummies(tbl)[[1]]
+Y <- contingency_dummies(tbl)[[2]]
 ```
+
+```{r}
+kable(head(X))
+```
+
+```{r}
+kable(tail(Y))
+
+```
+
+
+### Calculos
+
+Recuperar la tabla de contingencia
 
 ```{r}
 kable(t(X) %*% Y)
 ```
 
+
+Total de observaciones en X
 ```{r}
-Dr = t(X) %*% X
-kable(Dr)
+kable(t(X) %*% X)
 ```
 
 
+Total de observaciones en Y
 ```{r}
-Dc = t(Y) %*% Y
-kable(Dc)
+kable(t(Y) %*% Y)
 ```
 
-## Row profiles
+Matriz de frecuencias relativas
 
 ```{r}
-Dr_inv <- diag(1/diag(Dr))
-dimnames(Dr_inv) <- dimnames(Dr)
-Pr <-  Dr_inv %*% t(X) %*% Y
+kable(t(X) %*% Y / sum(as.numeric(t(X) %*% Y)))
+```
+
+Otra forma de construirla matricialmente
+
+```{r}
+ones_row <- rep(1, ncol(X))
+ones_col <- rep(1, ncol(Y))
+N <- as.numeric(ones_row %*% t(X) %*% Y %*% ones_col)
+P <- t(X) %*% Y / N
+kable(P)
+
+```
+
+### Analisis por filas
+
+Vamos a construir la matriz de perfiles por fila. Consiste del conteo en cada celda dividiendo cada fila por la suma de la fila. Recordemos que las suma de las filas se obtienen de la diagonal de $X^tX$.
+
+Ademas reconocemos la estructura conocida de $$(X^tX)^{-1}X^tY$$. La entrada $(r,c)$ representa $P(Y=c|X=r)$.
+
+
+```{r}
+# (X'X)^(-1)X'Y
+Pr <- solve(t(X) %*% X, t(X) %*% Y)
 kable(Pr)
 ```
 
-Que tan diferentes son las filas una de otra?
+Visualizamos
 
-El individuo promedio o esperado:
+```{r, results='hide', message=FALSE, warning=FALSE}
+library(ggtern)
+```
+
+```{r, fig.width=4}
+plot_dat <- data.frame(Pr, check.names = FALSE)
+ggtern(plot_dat, aes(x = `Brown Eyes`,
+               y = `Green Eyes`,
+               z = `Hazel Eyes`,
+                colour = `Blue Eyes`)) +
+  geom_point() + 
+  geom_text(aes(label = row.names(plot_dat)))
+```
+
+
+Para poder medir distancias adecuadamente entre cada perfil de fila, necesitamos medir la diferencia en distribución pesada inversamente proporcional al peso o masa de cada columna. Esto se conoce como distancia **chi-cuadrada**.
+
+```{r}
+chi_dist <-  function(row1, row2, tbl) {
+  col_masses <-  as.numeric(apply(tbl, 2, sum)) / 
+    sum(as.numeric(tbl))
+  Pr <- solve(t(X) %*% X, t(X) %*% Y)
+  dif <- as.numeric(Pr[row1, ]) - as.numeric(Pr[row2, ])
+  sqrt(sum((1 / col_masses)*dif^2))
+}
+```
+
+```{r}
+col_mass <- apply(tbl, 2, sum) / 
+  sum(as.numeric(tbl))
+kable(col_mass)
+```
+
+Por ejemplo, distancia entre brown hair y black hair es
+
+```{r}
+chi_dist(1, 2, tbl)
+
+```
+
+y la diferencia entre brown hair y blond hair es
 
 
 ```{r}
+chi_dist(1, 4, tbl)
+```
+
+Matriz de distancia entre perfiles de fila
+
+```{r}
+hair_types <- dimnames(tbl)[[1]]
+n_types <- length(hair_types) 
+row_dist_mat <- matrix(0, 
+                       ncol = n_types, 
+                       nrow = n_types,
+                       dimnames = list(hair_types, hair_types))
+for (i in 1:(n_types - 1)) {
+  for (j in i:n_types) {
+    row_dist_mat[i, j] <- chi_dist(i, j, tbl)
+    row_dist_mat[j, i] <-  row_dist_mat[i, j]
+  }
+}
+kable(row_dist_mat)
+```
+
+
+## Scores o factores de filas
+
+Tenemos que hacer una descomposicion de valores singulares generalizada como sigue.
+
+Primero vamos a voltear a ver la matriz de diferencias respecto al "tipo de ojo esperado del total de la poblacion del mundo".
+
+```{r}
+col_mass <- apply(tbl, 2, sum) / 
+  sum(as.numeric(tbl))
+kable(col_mass)
+```
+
+Vamos a calcular las diferencias respecto a perfil del "mundo"
+```{r}
+ # restar a cada columna su masa (el porcentaje obsevado de ese color de ojos)
+Pr_tilde <- Pr - ones_col %*% t(col_mass)
+kable(Pr_tilde)
+```
+ Notemos
+ 
+ 
+```{r}
+kable(ones_col %*% t(col_mass))
+
+```
+```{r}
+apply(tbl, 2, sum) / sum(as.numeric(tbl))
+```
+
+
+ 
+ 
+ Queremos una descomposicion de la forma
+ 
+ $$
+ \tilde{P_r} = U \Delta V^t
+ $$
+ 
+ donde 
+ 
+ $$
+ U^tD_rU = I \quad \text{ y } \quad V^tD_c^{-1}V = I
+ $$
+ 
+```{r}
+tbl <- t(X) %*% Y
 N <-  sum(as.numeric(tbl))
-c <-  diag(Dc / N) # typical col
-c 
+Pr <- solve(t(X) %*% X, t(X) %*% Y)
+col_mass <- apply(tbl, 2, sum) /  N
+ones_col <- rep(1, ncol(Y))
+Pr_tilde <- Pr - ones_col %*% t(col_mass)
+Dr <- t(X) %*% X / N
+Dc <- t(Y) %*% Y / N
+Drinv <- solve(Dr)
+Dcinv <- solve(Dc)
+```
+```{r}
+res <- svd(Pr_tilde)
+u <- 
 ```
 
-Diferencia del perfil de fila con el individuo esperado:
-
 ```{r}
-ones_cols <-  rep(1, length(c))
-Pr_centred <- Pr - ones_cols %*% t(c) 
-kable(Pr_centred)
-```
+kable(res$u)
 
-Cuanto suman las filas de la matriz? QUe mas podemos decir de esta matriz?
-
-
-```{r}
-c <-  diag(Dc / N)
-r <-  diag(Dr / N)
-expected <- N * r %*% t(c)
-kable(expected)
-```
-
-
-
-```{r}
-kable(tbl - expected)
 ```
 
 
 ```{r}
-X_tilde <- scale(X, center = TRUE, scale = FALSE)
-Y_tilde <- scale(Y, center = TRUE, scale = FALSE)
-t(X_tilde) %*% Y_tilde
+kable(diag(res$d))
+
+```
+
+
+```{r}
+kable(t(res$v))
+
 ```
