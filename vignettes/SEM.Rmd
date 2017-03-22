@@ -38,7 +38,8 @@ diagram, conociendose este metodo como path analysis.
 
 <br>
 
-<img src="../alumnos/Equipo3/tareas/doc/Example_Structural_equation_model.png" width="500px"/>
+<img src="../vignettes/SEM/Example_Structural_equation_model.png" width="500px"/>
+
 <br>
 
 
@@ -190,7 +191,7 @@ Un vez que se tiene el modelo y la matriz de covarianza se usa la funcion `sem::
 
 ```{r}
 # 3. libreria SEM
-cat(file = "sem_intellect.txt",
+cat(file = "../vignettes/SEM/sem_intellect.txt",
 "humor -> simpsons, NA, 1
 humor -> familyguy, l2, NA
 humor -> amerdad, l3, NA
@@ -220,7 +221,7 @@ pathDiagram(fit.sem)
 
 <br>
 
-<img src="../alumnos/Equipo3/tareas/doc/red_sem.png" width="500px"/>
+<img src="../vignettes/SEM/red_sem.png" width="500px"/>
 
 <br>
 
