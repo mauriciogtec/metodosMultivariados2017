@@ -1,14 +1,18 @@
 Package: metodosMultivariados2017
-Title: Paquete del curso Metodos Multivariados en Ciencias de Datos y Estadistica
+Title: Paquete del curso Metodos Multivariados en Ciencias de Datos y
+    Estadistica
 Version: 0.1
 Authors@R: person("Mauricio", "Garcia Tec", email = "mauriciogtec@gmail.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
 Depends:
     R (>= 3.2.3)
 LazyData: true
-Imports: magrittr
+Imports:
+    magrittr
 Suggests:
     knitr,
-    rmarkdown
+    rmarkdown,
+    ggplot2,
+    ggtern
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
