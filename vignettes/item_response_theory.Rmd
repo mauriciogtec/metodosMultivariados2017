@@ -1,0 +1,207 @@
+---
+title: "Item Response Theory"
+author: 
+- Ixchel G. Meza Chavez
+- Fernanda Téllez Girón
+- Fernando Garduño Galaviz
+- Jorge Joaquin Popoca Herrera
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Es un paradigma psicométrico utilizado para diseñar, desarrollar, ensamblar, calificar y analizar evaluaciones.
+
+Su predecesor es la teoría clásica de los tests (Classical test theory).
+
+## Función de respuesta al ítem
+
+Su función principal es la función de respuesta al ítem (IRF) o curva característica del item (ICC), que describe la probabilidad de una respuesta como función de un rasgo latente unidimensional de una persona, por ejemplo su habilidad cognitiva, física, conocimiento, actitud.
+
+## Parámetros
+
+IRT puede usar uno, dos o tres parámetros:
+
+**Parametro b**: es el parámetro de la dificultad o parámetro umbral. Su valor nos dice que tan fácil o difícil es el item. Es usado en el modelo IRT 1P de un parámetro.
+
+**Parámetro a**: conocido como el parámetro de discriminación. Su valor nos dice que tan eficaz es el item para discriminar entre examinados muy competentes y poco competentes. El modelo 2P IRT usa los parámetros A y B.
+Este modelo es más complicado y no hay una respuesta universal a la pregunta ¿cuál es el item más dificil? La paradoja Lord sucede cuando a examinados más competentes se les dificulta más el item i que el item j y a examinados menos competentes se les dificulta más el item j que el i.
+
+**Parámetro c**: se le conoce como el parámetro G o "guessing parameter". Su valor nos dice que tan probable es que el examinado obtenga una respuesta correcta al adivinar la respuesta. El modelo IRT 3P usa los tres parámetros A,B,G. En la grafica ICC los interceptos son más altos que en IRT 2P, lo que dice que se elevan las probabilidades de obtener respuesta correcta pese a no conocer el tema.
+
+## Función de información al ítem
+
+La función de información al item (IIF) calcula cuánta información puede darnos cada IRF.
+La precisión al estimar un parámetro es una función de la variabilidad de los estimados alrededor del valor del parámetro, es decir es recíproco a la varianza:
+En una situacion dicotomica, la función de información al ítem depende de la probabilidad de responder correctamente y de la probabilidad de responder incorrectamente así como de sus parámetros.
+
+## Modelo 1PL IRT
+
+Este modelo tiene un parámetro; el parámetro b.
+Predice la probabilidad de que un examinado dé una respuesta correcta dada la habilidad del examinado $\theta_j$ y el parámetro de la dificultad $b_i$ de cierto ítem. Dicha probabilidad está dada por
+ 
+$P_{ij}(\theta_j,b_i) = \frac {e^{\theta_j - b_i}} {1 + e^{\theta_j - b_i}}$
+
+Su función de respuesta al ítem es de la forma:
+
+![Función de respuesta al ítem $P(\theta)$](item_response_theory/IRF_1PL.png)
+
+Su función de información al ítem está dada por
+
+$I_i(\theta,b_i) = P_i(\theta,b_i)Q_i(\theta,b_i)$
+
+donde $Q(\theta)$ es la probabilidad de responder incorrectamente, por lo que $Q(\theta) = 1 - P(\theta)$
+
+![Función de información al ítem y función de información del test$I(\theta)$](item_response_theory/IRF_IIF_1PL.png)
+
+## Modelo 2PL IRT
+
+Este modelo tiene dos parámetros; el parámetro b y el a.
+Predice la probabilidad de que un examinado dé una respuesta correcta dada la habilidad del examinado $\theta_j$, el parámetro de la dificultad $b_i$ de cierto ítem y el parámetro $a_i$ de discriminación de los examinados. Dicha probabilidad está dada por
+ 
+$P_{ij}(\theta_j,b_i,a_i) = \frac {e^{a_i(\theta_j - b_i)}} {1 + e^{a_i(\theta_j - b_i)}}$
+
+En la siguiente gráfica se muestra la función de respuesta al ítem de tres ítems
+
+![Función de respuesta al ítem $P(\theta)$ de tres ítems](item_response_theory/IRF_2PL.png)
+
+La función de información al ítem está dada por
+
+$I_i(\theta,b_i,a_i) = a_i^2P_i(\theta,b_i)Q_i(\theta,b_i)$
+
+![Función de respuesta al ítem $P(\theta)$ y función de información al ítem $I(\theta)$ de tres ítems](item_response_theory/IRF_IIF_2PL.png)
+
+## Modelo 3PL IRT
+
+Este modelo tiene tres parámetros; el parámetro b, el a y el c.
+Este modelo es como un modelo 2PL cuya función de respuesta al ítem es modificada de tal forma que su asíntota inferior sea mayor que cero, es decir que la probabilidad de una respuesta correcta ya no se acerca a cero conforme la habilidad tiende a $-\infty$, sino a $\frac1 k$, donde k es el número de categorías de respuesta en el ítem de opción múltiple. Esto se debe a que la probabilidad de obtener una respuesta correcta al adivinar la respuesta es $\frac1 k$.
+La probabilidad de este modelo está dada por
+ 
+$P_{ij}(\theta_j,b_i,a_i,c) = c + (1-c) \frac {e^{a_i(\theta_j - b_i)}} {1 + e^{a_i(\theta_j - b_i)}}$
+
+La función de información al ítem está dada por
+
+$I(\theta,b,a,c) = a^2\frac{Q(\theta)} {P(\theta)}[\frac{P(\theta)-c} {1-c}]^2$
+
+![Función de respuesta al ítem $P(\theta)$ y función de información al ítem $I(\theta)$ de dos ítems](item_response_theory/IRF_IIF_3PL.png)
+
+
+##Ejemplo
+
+Contamos con información de el examen LSAT. Esta información contiene las respuestas de 1000 estudiantes para 5 items(preguntas). Se encuentran marcadas como correcta o incorrecta (1 o 0 respectivamente).
+```{r, include=FALSE}
+library(psych)
+library(ltm)
+library(mirt)
+```
+
+```{r, include=TRUE}
+#Cargamos los datos. Revisamos que se hayan cargado correctamente. 
+data(LSAT)
+head(LSAT)
+```
+```{r, include=TRUE}
+#Corremos el modelo.
+IRTmodelo<-ltm(LSAT ~ z1, IRT.param = TRUE)
+```
+
+Observamos los coeficientes asociados a estos items. Vemos que todos los elementos de Difficulty son negativos(las preguntas son sencillas) y los de Discrimination son menores a 1 (no están discriminando en gran medida). 
+
+```{r, include=TRUE}
+coef(IRTmodelo)
+```
+
+Graficamos los items juntos para ver su comportamiento. 
+```{r,include=TRUE}
+plot(IRTmodelo, type= "ICC")
+```
+Con esto observamos que la mayoría de los items, con excepción del 3, están sesgados hacia la izquierda de la distribución por lo que parecen ser preguntas sencillas que no ayudan a discriminar a los estudiantes. 
+
+Gráfica de informacióń. 
+```{r,include=TRUE}
+plot(IRTmodelo, type= "IIC",items=0)
+```
+El punto más alto de esta gráfica sugiere el punto en el que se están polarizando los resultados. En este caso nos ayuda a discriminar estudiantes con muy bajo rendimiento de estudiantes con rendimiento bajo.
+
+Procedemos a ver los factores asociados a cada posible combinación. No tiene el mismo valor tener dos respuestas correctas si ambas eran fáciles que si una era fácil y la otra difícil.
+Z1 representa el puntaje que se esperaría de la persona dado el patrón de los datos. 
+
+```{r, include=TRUE}
+factor.scores(IRTmodelo)
+
+```
+```{r,include=FALSE}
+person.fit(IRTmodelo)
+```
+#IRT usando factor analysis
+
+A pesar de que Exploratory Factor Analysis y Item Response Theory parezcan diferentes modelos para datos binarios ambos nos proveen de parámetros estimados de dificultad y de discriminación equivalentes. 
+
+En este caso las correlaciones tetracóricas y policóricas del data set son analizadas por medio de factores usando el método de mínimos residuales o máxima verosimilitud. Los loadings que se obtienen son posteriormente transformados en los parámetros de discriminación, mientras que para estimar la dificultad se combinan los parámetros de las correlaciones tetra/polycóricas y el loading.  
+
+Existe una librería en R que nos permite aplicar IRT por medio de factor analysis. 
+
+Utilizando los mismos datos utilizamos la función *irt.fa* que también es parte del paquete psych.
+```{r,include=FALSE}
+test_irt <- irt.fa(LSAT)
+```
+
+Graficamos las curvas de información acumulada. Podemos observar que aunque cambian ligeramente, la curva 3 sigue siendo la que más información aporta. 
+
+```{r}
+
+plot(test_irt,type="ICC")
+
+```
+
+Posteriormente graficamos las curvas de información y observamos en que escala nos permite cada item polarizar. Los valores de los parámetros de discriminación utilizando estos dos métodos no son iguales debido a que la función *irt.fa* reporta los resultados en unidades de la función normal y la función *ltm* los reporta en unidades logarítmicas. Sin embargo los resultados en términos de qué items proveen más información son iguales para ambos métodos. 
+
+```{r}
+plot(test_irt,type="IIC")
+```
+
+###Comparación
+
+Utilizando IRT sin factor analysis obtenemos la tabla de dificultad. Si la normalizamos para tener resultados comparables con el IRT por Factor analysis obtenemos lo siguiente. 
+
+
+```{r}
+lsat_ltm <- ltm(LSAT~z1)
+round(coefficients(lsat_ltm)/1.702,3) 
+```
+
+Si realizamos este mismo análisis con Factor Análisis y obteneos la dificultad podemos observar que es cercana a la estimación anterior y mantienen el orden de dificultad de las preguntas. 
+
+```{r}
+ls_fa <- irt.fa(LSAT,plot=FALSE)
+ls_fa$tau
+```
+
+
+
+
+#Conclusión
+
+Imagina que tu objetivo es diferenciar a las personas amantes de los perros de las personas que no les gustan tanto.
+
+##¿Cúal de las siguientes preguntas te ayudaría más a polarizar las respuestas?
+
+####1. ¿Crees que este cachorrito es tierno?
+![Cute Puppy](item_response_theory/cute_puppy.jpg)
+
+####2. ¿Tienes un perro como mascota?
+
+#####*Hint: Evidentemente todo el mundo piensa que el cachorrito es tierno. 
+
+
+
+
+
