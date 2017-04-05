@@ -27,3 +27,9 @@
 #' @source Los datos se obtuvieron de \link{www.senado.gob.mx} usando
 #' \link{github.com/mauriciogtec/votacionEspacialMexico}
 "senado_partidos"
+
+#' @title Data STUDENT
+#' @description Data de Student para MCA
+#' @usage data(STUDENT)
+#' @docType data
+

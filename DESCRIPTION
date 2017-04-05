@@ -8,11 +8,14 @@ Depends:
     R (>= 3.2.3)
 LazyData: true
 Imports:
-    magrittr
+    magrittr,
+    FactoMineR,
+    factoextra,
+    gplots,
+    ggtern
 Suggests:
     knitr,
     rmarkdown,
-    ggplot2,
-    ggtern
+    ggplot2
 VignetteBuilder: knitr
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
