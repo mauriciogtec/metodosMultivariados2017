@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="MultiTeam" />
+
+<meta name="date" content="2017-04-04" />
+
+<title>Vignette para distancias</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Vignette para distancias</h1>
+<h4 class="author"><em>MultiTeam</em></h4>
+<h4 class="date"><em>2017-04-04</em></h4>
+
+
+
+<div id="escalas-de-medicion" class="section level1">
+<h1>Escalas de medición</h1>
+<p>La idea de la media es algo natural en el hombre. La medida surge de la comparación. Galileo Galilei dijo: “Mide lo que se puedas medir; y lo que no, hazlo medible”, Lord Kelvin en el siglo XIX dijo: “Cuando uno puede medir aquello de lo que se está hablando y expresarlo en números, se sabe algo acerca de ello; pero cuando no puede medirlo, cuando no puede expresarlo en números, su conocimiento es escaso e insatisfactorio, esto podría ser un principio de conocimiento pero escasamente este conocimiento ha avanzado a la etapa de una ciencia”. La idea fundamental de la medida es una “función”. La medición tiene tres propiedades que brindan congruencia entre los hechos y el concepto teórico que son objeto de estudio. Estas propiedades son: validez, consistencia y objetividad. Una medida es válida cuando mida lo que pretende medir. Una medida es consistente cuando se tienen mediciones repetidas sobre un fenómeno y arrojan resultados iguales. Una medida es objetiva cuando dos observadores diferentes toman medidas sobre un fenómeno y sus resultados no difieren.</p>
+<p>La medición existe en una variedad de formas y las escalas de medición caen en ciertas clases definidas.</p>
+<p>Una primera clasificación de los datos puede ser cualitativos (cualidades) y cuantitativos (cantidades).Una clasificación más exhaustiva, se pueden dividir en cuatro grandes escalas de medición: nominal, ordinal, de intervalo y de razón.</p>
+<pre><code>        -Variables cualitativas: Nominal u Ordinal.
+        -Variables cuantitativas: Intervalo o de Razón.
+        </code></pre>
+<p>Stevens publicó en 1946 en al revista <em>Science</em> un artículo titulado <em>On the theory of scales of measurement</em> en donde propone una clasificación que contempla cuatro tipo básicos de mediciones.</p>
+<p>Las escalas de medición es una pirámide dónde la primera escala es la <em>nominal</em>, el segundo peldaño es la escala de <em>ordinal</em> , el tercer escalón es la escala de <em>intervalo</em> y el cuarto escalón es la escala de <em>razón</em>.</p>
+<div id="datos-cualitativos" class="section level2">
+<h2>Datos cualitativos</h2>
+<p>Los datos cualitativos son mediciones de cualidades, el resultado de observar un carácter cualitativo se le denomina atributo o variable cualitatitiva. Las unidades de análisis varían cualitativamente con respecto a una determinada características y se pueden clasificar en categorías o modalidades. Los atributos pueden ser dicotómicos, caracterizados por la presencia/ausencia de una propiedad o politómicos.</p>
+<p>Para clasificar las unidades de análisis es necesario que las categorías cumplan lo siguiente: 1) Deben estar bien definidas. 2) Ser mutuamente excluyentes (solo pertenece a una categoría). 3) Ser exhaustivas (todo elemento esta en alguna categoría)</p>
+<p>Una clasificación exhaustiva de los datos cualitativos son: nominales u ordinales.</p>
+<div id="escala-nominal" class="section level3">
+<h3>Escala Nominal</h3>
+<p>En la escala de medición nominal, los números representan una clasificación, por lo general son datos discretos. Las variables que están medidas en esta escala, solo se puede realizar conteos de frecuencias. Las únicas relaciones matemáticas adecuadas son las de equivalencia o no equivalencia. Una unidad de análisis puede tener la característica que define la clase o no la tiene. Este nivel de medición tiene el nivel más bajo. La única operación válida con esos números es el conteo de las frecuencias absolutas y posteriormente la obtención de frecuencias relativas. Con la disposición de frecuencias es válida la identificación del valor que aparece con mayor frecuencia y la realización de pruebas cuyos datos de ingreso son frecuencias como aquellas basadas en la Binomial, Multinomial o Ji cuadrada.</p>
+<p>Por ejemplo en la base de datos ‘Adult Data Set’ tenemos variables medidas en escala nominal.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">adult &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;./adult.txt&quot;</span>,<span class="dt">header=</span><span class="ot">FALSE</span>)
+<span class="kw">names</span> (adult) =<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;age&quot;</span>, <span class="st">&quot;workclass&quot;</span>, <span class="st">&quot;fnlwgt&quot;</span>, <span class="st">&quot;education&quot;</span>,
+<span class="st">&quot;education_num&quot;</span>, <span class="st">&quot;marital_status&quot;</span>, <span class="st">&quot;occupation&quot;</span>, <span class="st">&quot;relationship&quot;</span>,
+<span class="st">&quot;race&quot;</span>, <span class="st">&quot;sex&quot;</span>, <span class="st">&quot;capital_gain&quot;</span>, <span class="st">&quot;capital_loss&quot;</span>, <span class="st">&quot;hours_per_week&quot;</span>, <span class="st">&quot;native_country&quot;</span>,<span class="st">&quot;uji&quot;</span>)
+
+adult &lt;-adult[<span class="kw">complete.cases</span>(adult),]</code></pre></div>
+<p>Si observamos las tablas de frecuencias de todas las variables tenemos que la variable: age, workclass, fnlwgt, education, education_num, marital_status, occupation, relationship, relationship, race, sex, native_country y v15.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v1 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">age=</span>adult[,<span class="dv">1</span>]))
+v2 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">workclass=</span>adult[,<span class="dv">2</span>]))
+v3 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">fnlwgt=</span>adult[,<span class="dv">3</span>]))
+v4 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">education=</span>adult[,<span class="dv">4</span>]))
+v5 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">education_num=</span>adult[,<span class="dv">5</span>]))
+v6 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">marital_status=</span>adult[,<span class="dv">6</span>]))
+v7 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">occupation=</span>adult[,<span class="dv">7</span>]))
+v8 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">relationship=</span>adult[,<span class="dv">8</span>]))
+v9 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">race=</span>adult[,<span class="dv">9</span>]))
+v10 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">sex=</span>adult[,<span class="dv">10</span>]))
+v14 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">native_country=</span>adult[,<span class="dv">14</span>]))
+v15 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">uji=</span>adult[,<span class="dv">15</span>]))</code></pre></div>
+</div>
+<div id="escala-ordinal" class="section level3">
+<h3>Escala ordinal</h3>
+<p>La escala de medición ordinal, los números representan una clasificación pero se puede ordenar. En esta escala los números pueden servir para representar la posición de una serie o para indicar el rango ordenado de los elementos. Podemos ordenar las unidades de análisis.</p>
+<p>Las operaciones que están permitidas o que tienen algún significado, es la relación que se expresa en términos del álgebra de las desigualdades es decir, existe transitividad (A&gt;B&gt;C -&gt; A&gt;C).</p>
+<p>Entre las pruebas estadísticas que se basan en este tipo de escala se pueden mencionar las asociadas a coeficiente de correlación por rangos, como el de Spearman y el de Kendall, la prueba de la Mediana y la U de Mann y Whitney.</p>
+<p>Por ejemplo en la base de datos <em>Adult Data Set</em> las variables que tienen un tipo de medición ordinal son: age y education.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v4 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">education=</span>adult[,<span class="dv">4</span>]))
+v1 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">age=</span>adult[,<span class="dv">1</span>]))</code></pre></div>
+</div>
+</div>
+<div id="datos-cuantitativos" class="section level2">
+<h2>Datos cuantitativos</h2>
+<p>Los datos cuantitativos son mediciones de cantidades. Cuando no solamente es posible distinguir la diferencia entre los diversos grados de propiedad de un objeto (características de la medida ordinal) sino también puede discernirse las diferencia entre objetos iguales, se recurre a la medida de intervalo.</p>
+<div id="escala-de-intervalo" class="section level3">
+<h3>Escala de Intervalo</h3>
+<p>La medición en una escala de intervalo consiste en asignar un número de unidades de análisis (elementos) para indicar su posición exacta a lo largo de una escala continua. Este tipo de escala nos permiten decir qué distancia separa a un elemento de otro. Los números pueden servir para indicar las diferencias entre los elementos (número reales).</p>
+<p>Las medidas de intervalo, implican la asignación de números de modo tal, que a iguales diferencia entre los grados del atributo de un objeto, correspondan iguales diferencias entre los números. Una de las características es que el cero (0) no implica ausencia del atributo, el cero es arbitrario.</p>
+<p>Valores medios en escala intervalar son susceptibles de cálculo para todo tipo de estadística como media aritmética, media geométrica, varianza, desviación estándar, coeficiente de correlación producto momento de Pearson.</p>
+</div>
+<div id="escala-de-razon" class="section level3">
+<h3>Escala de Razón</h3>
+<p>En la escala de razón la idea central es que el cero es absoluto, el cero significa la usencia de la característica observada. A iguales diferencias entre los números asignados, corresponden iguales diferencias en el grado de atributo presente en el objeto de estudio. Los números pueden servir para indicar las proporciones entre los elementos (números reales).</p>
+<p>Las operaciones permitidas son: suma, resta multiplicación y división, es decir, diferencias iguales entre puntos de cualquier parte de la escala son iguales entre si.</p>
+<p>Otra característica de las escalas de orden superior (Razón) es que se pueden transformaR fácilmente en escalas de orden más bajo.</p>
+<p>Por ejemplo en la base de datos <em>Adult Data Set</em>, las siguientes variables están medidas en escala de razón: capital_gain, capital_loss y hours_per_week.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v11 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">capital_gain=</span>adult[,<span class="dv">11</span>]))
+v12 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">capital_loss=</span>adult[,<span class="dv">12</span>]))
+v13 &lt;-<span class="st"> </span><span class="kw">as.data.frame</span>(<span class="kw">table</span>(<span class="dt">hours_per_week=</span>adult[,<span class="dv">13</span>]))</code></pre></div>
+<p>Stevens propone la siguiente tabla resumen de las propiedades de escala de medición.</p>
+<table>
+<colgroup>
+<col width="15%"></col>
+<col width="22%"></col>
+<col width="25%"></col>
+<col width="36%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th>Escala</th>
+<th>Localización</th>
+<th>Dispersión</th>
+<th>Asociación</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><p>Nominal</p></td>
+<td><p>Moda</p></td>
+<td><p>Frecuencia, Indice de Shannon H</p></td>
+<td><p>Coef. contiengencia, Corr. tetracórica, Indice de inf. transmitida T</p></td>
+</tr>
+<tr class="even">
+<td><p>Ordinal</p></td>
+<td><p>Mediana</p></td>
+<td><p>Percentiles, Rangos semicuartil</p></td>
+<td><p>Coef. corr. Spearman</p></td>
+</tr>
+<tr class="odd">
+<td><p>Intervalo</p></td>
+<td><p>Media aritmética</p></td>
+<td><p>Desviación media , Desviación estándar, Varianza</p></td>
+<td><p>Coef. corr. de Pearson</p></td>
+</tr>
+<tr class="even">
+<td><p>Razón</p></td>
+<td><p>Media geométrica Media armónica</p></td>
+<td><p>Coeficientes de variación, Error estándar</p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="medidas-de-distancia" class="section level1">
+<h1>Medidas de distancia</h1>
+<div id="medidas-de-distancia-para-variables-de-intervalo-y-de-razon" class="section level2">
+<h2>Medidas de distancia para variables de intervalo y de razón</h2>
+<p>Medidas de disimilaridad entre individuos. Algunas medidas de disimilaridad entre individuos para <em>p</em> variables cuantitativas son:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>Distancia euclidiana</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[d_{ij}=\sqrt{\sum_{k=1}^{p} (x_{ik}-x_{jk})^2}\]</span> Si calculamos la matriz de distancia para la variable <em>hours_per_week</em>.</p>
+<ul>
+<li><ol start="2" style="list-style-type: decimal">
+<li>Distancia euclidiana escalada</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[d_{ij}=\sqrt{\sum_{k=1}^{p} w_k(x_{ik}-x_{jk})^2}\]</span></p>
+<ul>
+<li><ol start="3" style="list-style-type: decimal">
+<li>Distancia Minkowski</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[ d_{ij}=(\sum_{k=1}^{p}\mid x_{ik}-x_{jk}\mid^\lambda)^\frac{1}{\lambda}\]</span></p>
+<ul>
+<li><ol start="4" style="list-style-type: decimal">
+<li>Distancia de Canberra</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[d_{ij}=\sum_{k=1}^{p}\frac{\mid x_{ik}-x_{jk} \mid}{\mid x_{ik}\mid + \mid x_{jk} \mid}\]</span></p>
+</div>
+<div id="medidas-de-distancia-para-variables-cualitativas" class="section level2">
+<h2>Medidas de distancia para variables cualitativas</h2>
+<p>Los datos dicotómicos se caracterizan por tener sólo dos posibles estados. Existen variables simétricas y asimétricas. Las variables binarias se pueden representar en tablas de contingencia. La suma de <em>a+b+c+d</em> equivalen al número de variables.</p>
+<table>
+<thead>
+<tr class="header">
+<th>1</th>
+<th>0</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>a</td>
+<td>b</td>
+</tr>
+<tr class="even">
+<td>c</td>
+<td>d</td>
+</tr>
+</tbody>
+</table>
+<p>Por ejemplo en la base de datos <em>Adult Data Set </em> podemos realizar una tabla de contingencia.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">ftable</span>(adult$sex, adult$uji)</code></pre></div>
+<pre><code>##                 &lt;=50K  &gt;50K
+##                            
+##              0      0     0
+##  Female      0   9592  1179
+##  Male        0  15128  6662</code></pre>
+<p>Algunas medidas de disimilitud entre individuos para variables dicotómicas son:</p>
+<ul>
+<li><ol style="list-style-type: decimal">
+<li>Medida de concordancia simple (variables simétricas) Esta medida equivale a la proporción de las variables en donde los individuos no coinciden.</li>
+</ol></li>
+</ul>
+<p><span class="math display">\[d_{ij}=1-\frac{a+d} {p}=\frac{b+c}{p}\]</span></p>
+<ul>
+<li><ol start="2" style="list-style-type: decimal">
+<li>Coeficiente de Czekanowski</li>
+</ol></li>
+</ul>
+<p>Este coeficiente se enfatiza la presencia de las características. Al igual que el anterior es adecuado para variables asimétricas.</p>
+<p><span class="math display">\[d_{ij}=\frac {b+c} {2a+b+c}\]</span> Utilizando la tabla de contingencia tenemos: <span class="math display">\[d_{ij}=\frac{1179+15128} {2*9592+1179+15128}=0.4594686\]</span>$</p>
+<ul>
+<li><ol start="3" style="list-style-type: decimal">
+<li>Coeficiente de Jaccard</li>
+</ol></li>
+</ul>
+<p>Este cociente nos ayuda a medir la similitud entre dos conjuntos, en este caso conjuntos de variables observadas sin precisar que tipo de variables son. Es por ello que lo podemos utilizar para datos categóricos.</p>
+<p><span class="math display">\[
+J(A,B)= \dfrac{A \cap B}{A \cup B}
+\]</span> El número de elementos que ocurren en ambos conjuntos u observaciones dividido por el número total de elementos en los conjuntos menos su intersección. Veamos un ejemplo en nuestra base de datos adults, para ver como difieren dos individuos. Distancia de Jaccard en una muestra de 100 observaciones</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">'clusteval'</span>)
+<span class="kw">library</span>(<span class="st">'arules'</span>)</code></pre></div>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: 'arules'</code></pre>
+<pre><code>## The following objects are masked from 'package:base':
+## 
+##     abbreviate, write</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">data</span>(<span class="st">&quot;Adult&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">127049</span>)
+adult_s &lt;-<span class="st"> </span><span class="kw">sample</span>(Adult, <span class="dv">2</span>)
+## calculate Jaccard distances and do hclust
+d_jaccard &lt;-<span class="st"> </span><span class="kw">dissimilarity</span>(adult_s)
+d_jaccard</code></pre></div>
+<pre><code>##       1081
+## 35934 0.75</code></pre>
+<p>Vemos como entre dos individuos tenemos que para sus variables categóricas tienen un coeficiente de disimilitud de jaccard de 0.75. Ahora, lo podemos hacer para más individuos, supongamos que ahora tenemos una muestra de tamaño 10.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(<span class="st">'clusteval'</span>)
+<span class="kw">library</span>(<span class="st">'arules'</span>)
+<span class="kw">data</span>(<span class="st">&quot;Adult&quot;</span>)
+<span class="kw">set.seed</span>(<span class="dv">127049</span>)
+adult_s10 &lt;-<span class="st"> </span><span class="kw">sample</span>(Adult, <span class="dv">10</span>)
+d_jaccard10 &lt;-<span class="st"> </span><span class="kw">dissimilarity</span>(adult_s10)
+d_jaccard10</code></pre></div>
+<pre><code>##            1081     35934     39072     41093      5863     25532
+## 35934 0.7500000                                                  
+## 39072 0.6111111 0.6666667                                        
+## 41093 0.6111111 0.5882353 0.7368421                              
+## 5863  0.7000000 0.6111111 0.7500000 0.6842105                    
+## 25532 0.4705882 0.7500000 0.6842105 0.6842105 0.6315789          
+## 41029 0.6842105 0.7368421 0.6666667 0.7368421 0.6111111 0.6111111
+## 14655 0.6315789 0.6842105 0.6111111 0.7500000 0.7000000 0.6315789
+## 40631 0.7500000 0.7368421 0.8000000 0.8571429 0.6111111 0.7500000
+## 23759 0.7619048 0.5294118 0.7500000 0.6111111 0.5555556 0.7619048
+##           41029     14655     40631
+## 35934                              
+## 39072                              
+## 41093                              
+## 5863                               
+## 25532                              
+## 41029                              
+## 14655 0.6111111                    
+## 40631 0.6666667 0.8095238          
+## 23759 0.7500000 0.7000000 0.7500000</code></pre>
+<p>Y podemos observar las diferentes interacciones entre la similitud de los individuos. Para ilustrarlo mejor, vamos a hacer agrupamiento jerárquico mediante “ward.D2” o el criterio de Murtagh &amp; Legendre, criterio con el cual las disimilitudes i.e las suma de cuadrados de errores se cuadran antes de la actualización del grupo. Es algo intuitivo pensar que en este caso la distancia va más allá de una geometría métrica.</p>
+<p>Pero para entender las disimilitudes entre grupos, recordamos que una distancia es positiva y simétrica para un par de vectores de una observación sobre los reales positivos que además satisface la desigualdad triangular. Sin embargo, aquí pedir la desigualdad triangular es algo fuerte, entonces definimos una distancia ultramétrica bajo los primeros dos supuestos anteriores y además definimos una agrupación jerárquica de tal modo que se cumpla la siguiente desigualdad.</p>
+<p><span class="math display">\[ d_j (i, j) ≤ max \{d_j (i, k), d_j (k, j)\}\]</span> Entonces, así construimos el siguiente dendograma para ver como según su similitud se van agrupando los clusters</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">hc &lt;-<span class="st"> </span><span class="kw">hclust</span>(d_jaccard10, <span class="dt">method =</span> <span class="st">&quot;ward.D2&quot;</span>)
+<span class="kw">plot</span>(hc, <span class="dt">main =</span> <span class="st">&quot;Dendograma de interacciones&quot;</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+<p>obtendremos 10 clusters para mirar en las barras la diferencia de las frecuencias de los artículos y para los 10 primeros artículos en el grupo 1 en comparación con los datos será la interpolación lineal.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">assign &lt;-<span class="st"> </span><span class="kw">cutree</span>(hc, <span class="dv">10</span>)
+<span class="kw">itemFrequencyPlot</span>(adult_s10[assign==<span class="dv">1</span>], <span class="dt">population=</span>adult_s10, <span class="dt">topN=</span><span class="dv">10</span>)</code></pre></div>
+<p><img src="data:image/png;base64,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" /><!-- --></p>
+</div>
+<div id="medidas-de-distancia-para-variables-de-distintas-escalas" class="section level2">
+<h2>Medidas de distancia para variables de distintas escalas</h2>
+<p>Existen dos principales alternativas para obtener la matriz de distancia cuando las variables son de diferente tipo (cuantitativas y cualitativas). La primera consiste en calcular las disimilidades entre las variables del mismo tipo y posteriormente calcular un promedio (ponderado). Otra alternativa es utilizar el coeficiente de similitud de <em>Gower</em> par aobtener una medida de disimilitud. Este coeficiente de similitud se obtiene como:</p>
+<p><span class="math display">\[ c_{ij}=\frac{\sum_{k=1}^{p} s_{ijk}}{\sum_{k=1}^{p} \delta_{ijk}}\]</span> donde s_{ijk} es la similitud del individuo <em>i</em> con el individuo <em>j</em> respecto a la variable <em>k</em> y</p>
+</div>
+<div id="distancia-para-datos-categoricos-nominales" class="section level2">
+<h2>Distancia para datos categoricos nominales</h2>
+<p>El objetico es comparar los atributos categorios de dos individuos X1 y X2 simultaneamente. Es imposible comparar directamente 2 individuos con un unico atributo categórico nominal de manera objetiva. Con un conjunto de atributos categoricos nominales podemos ver la distancia entre ellos de esta forma:</p>
+<p><span class="math display">\[D(X_{1},X_{2})=1-\frac{1}{N}\sum_{i=1}^N 1(X_{1i}= X_{2i}) \]</span> donde N:numeros de attributos categoricos</p>
+<p>En los datos de adult de UCI tenemos N=9 attributos categoricos,</p>
+<pre><code>##           workclass  education      marital_status         occupation
+## 1         State-gov  Bachelors       Never-married       Adm-clerical
+## 2  Self-emp-not-inc  Bachelors  Married-civ-spouse    Exec-managerial
+## 3           Private    HS-grad            Divorced  Handlers-cleaners
+## 4           Private       11th  Married-civ-spouse  Handlers-cleaners
+## 5           Private  Bachelors  Married-civ-spouse     Prof-specialty
+## 6           Private    Masters  Married-civ-spouse    Exec-managerial
+##     relationship   race     sex native_country ingreso_anual
+## 1  Not-in-family  White    Male  United-States         &lt;=50K
+## 2        Husband  White    Male  United-States         &lt;=50K
+## 3  Not-in-family  White    Male  United-States         &lt;=50K
+## 4        Husband  Black    Male  United-States         &lt;=50K
+## 5           Wife  Black  Female           Cuba         &lt;=50K
+## 6           Wife  White  Female  United-States         &lt;=50K</code></pre>
+<p>Hay atributos que no se pueden usar numéricamente para tratarles como distancias sin dar sentido o dar una estructura posible o sin perder información:<br />
+<strong>workclass|marital_status|occupation|relationship|native_country</strong></p>
+<p><em>Ejemplo</em>:</p>
+<p>Agregamos los atributos categóricos binarios (sex y ingreso_anual) y ordinal (education) para calcular esta distancia.</p>
+<p>Vamos a ver la distancia entre 1 y los otros hasta el individuo 10</p>
+<pre><code>##            workclass  education         marital_status         occupation
+## 1          State-gov  Bachelors          Never-married       Adm-clerical
+## 2   Self-emp-not-inc  Bachelors     Married-civ-spouse    Exec-managerial
+## 3            Private    HS-grad               Divorced  Handlers-cleaners
+## 4            Private       11th     Married-civ-spouse  Handlers-cleaners
+## 5            Private  Bachelors     Married-civ-spouse     Prof-specialty
+## 6            Private    Masters     Married-civ-spouse    Exec-managerial
+## 7            Private        9th  Married-spouse-absent      Other-service
+## 8   Self-emp-not-inc    HS-grad     Married-civ-spouse    Exec-managerial
+## 9            Private    Masters          Never-married     Prof-specialty
+## 10           Private  Bachelors     Married-civ-spouse    Exec-managerial
+##      relationship   race     sex native_country ingreso_anual
+## 1   Not-in-family  White    Male  United-States         &lt;=50K
+## 2         Husband  White    Male  United-States         &lt;=50K
+## 3   Not-in-family  White    Male  United-States         &lt;=50K
+## 4         Husband  Black    Male  United-States         &lt;=50K
+## 5            Wife  Black  Female           Cuba         &lt;=50K
+## 6            Wife  White  Female  United-States         &lt;=50K
+## 7   Not-in-family  Black  Female        Jamaica         &lt;=50K
+## 8         Husband  White    Male  United-States          &gt;50K
+## 9   Not-in-family  White  Female  United-States          &gt;50K
+## 10        Husband  White    Male  United-States          &gt;50K</code></pre>
+<pre><code>## [1] &quot;D(X_ 1  , X_ 1 )= 0&quot;
+## [1] &quot;D(X_ 1  , X_ 2 )= 0.44&quot;
+## [1] &quot;D(X_ 1  , X_ 3 )= 0.44&quot;
+## [1] &quot;D(X_ 1  , X_ 4 )= 0.67&quot;
+## [1] &quot;D(X_ 1  , X_ 5 )= 0.78&quot;
+## [1] &quot;D(X_ 1  , X_ 6 )= 0.67&quot;
+## [1] &quot;D(X_ 1  , X_ 7 )= 0.78&quot;
+## [1] &quot;D(X_ 1  , X_ 8 )= 0.67&quot;
+## [1] &quot;D(X_ 1  , X_ 9 )= 0.56&quot;
+## [1] &quot;D(X_ 1  , X_ 10 )= 0.56&quot;
+## [1] &quot;D(X_ 1  , X_ 11 )= 0.78&quot;
+## [1] &quot;D(X_ 1  , X_ 12 )= 0.67&quot;</code></pre>
+<p>El problema si no tenemos cuidado es tener una capacidad de discriminación débil con esta distancia. Esto es porque los valores son los mismos.</p>
+<p>Sin embargo, el dataset de Adult de UCI es utilizado para clasificar con la función objetivo ingreso anual (mas de 50k o no).Entonces con un estudio previo sobre los datos (arbol de decision , feature selecion) o interpretacion sociologico podemos añadir pesos para cada attributos.</p>
+<p>Lo que significa que un persona A puede ser mas similar a B para un problema dado (aqui el salario anual) que C a pesar que B tiene el mismo número de atributos idénticos que A o mas.</p>
+<p>Con pesos podemos definir una nueva distancia:</p>
+<p><span class="math display">\[D(X_{1},X_{2})=1-\sum_{i=1}^N 1(X_{1i}= X_{2i}) * W_{i} \]</span></p>
+<p>donde <span class="math display">\[\sum_{i=1}^N W_{i} =1\]</span></p>
+<p>Por ejemplo, si consideramos, subjetivamente, que el nivel de educación y el ocupación son parámetros importantes para el salario anual pues podemos considerar para el peso del attributo trabajo 0.2 y 0.15 para el peso del nivel de educación y los otros con 0.092986.</p>
+<pre><code>##            workclass  education         marital_status         occupation
+## 1          State-gov  Bachelors          Never-married       Adm-clerical
+## 2   Self-emp-not-inc  Bachelors     Married-civ-spouse    Exec-managerial
+## 3            Private    HS-grad               Divorced  Handlers-cleaners
+## 4            Private       11th     Married-civ-spouse  Handlers-cleaners
+## 5            Private  Bachelors     Married-civ-spouse     Prof-specialty
+## 6            Private    Masters     Married-civ-spouse    Exec-managerial
+## 7            Private        9th  Married-spouse-absent      Other-service
+## 8   Self-emp-not-inc    HS-grad     Married-civ-spouse    Exec-managerial
+## 9            Private    Masters          Never-married     Prof-specialty
+## 10           Private  Bachelors     Married-civ-spouse    Exec-managerial
+##      relationship   race     sex native_country ingreso_anual
+## 1   Not-in-family  White    Male  United-States         &lt;=50K
+## 2         Husband  White    Male  United-States         &lt;=50K
+## 3   Not-in-family  White    Male  United-States         &lt;=50K
+## 4         Husband  Black    Male  United-States         &lt;=50K
+## 5            Wife  Black  Female           Cuba         &lt;=50K
+## 6            Wife  White  Female  United-States         &lt;=50K
+## 7   Not-in-family  Black  Female        Jamaica         &lt;=50K
+## 8         Husband  White    Male  United-States          &gt;50K
+## 9   Not-in-family  White  Female  United-States          &gt;50K
+## 10        Husband  White    Male  United-States          &gt;50K</code></pre>
+<p>Comparemos el primero con los otros:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">for (i in <span class="dv">1</span>:<span class="dv">10</span>){
+<span class="kw">print</span>(<span class="kw">paste</span>(<span class="st">&quot;D(X_&quot;</span>,<span class="dv">1</span>,<span class="st">&quot; , X_&quot;</span>,i,<span class="st">&quot;)=&quot;</span>,<span class="kw">round</span>(<span class="kw">distancia_nominal_peso</span>(adult_trabajo[<span class="dv">1</span>,],adult_trabajo[i,]),<span class="dv">2</span>)))}</code></pre></div>
+<pre><code>## [1] &quot;D(X_ 1  , X_ 1 )= 0&quot;
+## [1] &quot;D(X_ 1  , X_ 2 )= 0.48&quot;
+## [1] &quot;D(X_ 1  , X_ 3 )= 0.54&quot;
+## [1] &quot;D(X_ 1  , X_ 4 )= 0.72&quot;
+## [1] &quot;D(X_ 1  , X_ 5 )= 0.76&quot;
+## [1] &quot;D(X_ 1  , X_ 6 )= 0.72&quot;
+## [1] &quot;D(X_ 1  , X_ 7 )= 0.81&quot;
+## [1] &quot;D(X_ 1  , X_ 8 )= 0.72&quot;
+## [1] &quot;D(X_ 1  , X_ 9 )= 0.63&quot;
+## [1] &quot;D(X_ 1  , X_ 10 )= 0.57&quot;</code></pre>
+</div>
+<div id="representacion-de-los-datos-en-r" class="section level2">
+<h2>Representacion de los datos en R</h2>
+<div id="fijos-binariosbooleanos" class="section level4">
+<h4>fijos binarios/Booleanos:</h4>
+<ul>
+<li>logical (TRUE/FALSE)</li>
+<li>DOUBLE (0/1)</li>
+</ul>
+</div>
+<div id="datos-categoricos-o-nominales" class="section level4">
+<h4>Datos categóricos o nominales:</h4>
+<ul>
+<li>Character (“Paris”)</li>
+<li>Vector de 0 y 1</li>
+</ul>
+</div>
+<div id="datos-ordinales" class="section level4">
+<h4>Datos Ordinales:</h4>
+<ul>
+<li>Character (“Bueno”, “Malo”, “Hrorrible”)</li>
+<li>Double</li>
+</ul>
+</div>
+<div id="datos-numericos" class="section level4">
+<h4>Datos Numéricos:</h4>
+<ul>
+<li>Double</li>
+</ul>
+<p>Podemos juntar los datos con un: ####vector c(TRUE, FALSE) Y es obligatorio tener el mismo dentro de un vector, podemos hacer varias operaciones.</p>
+</div>
+<div id="factores" class="section level4">
+<h4>Factores</h4>
+<ul>
+<li>Almacena variables cualitativas</li>
+<li>Almacena elementos de tipos diferentes</li>
+<li>Tiene atributo de nivel (conjunto posible de valores dentro del factor)</li>
+</ul>
+</div>
+<div id="matrices" class="section level4">
+<h4>Matrices</h4>
+<p>Todos los elementos son del mismo tipo</p>
+</div>
+<div id="dataframe" class="section level4">
+<h4>Dataframe</h4>
+<p>Es mas complejo que una matriz. Los elementos de una columna son todos del mismo tipo y cada columna puede tener un tipo diferente</p>
+</div>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

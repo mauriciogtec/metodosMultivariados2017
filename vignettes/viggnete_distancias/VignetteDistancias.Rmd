@@ -1,0 +1,430 @@
+---
+title: "Vignette para distancias"
+author: "MultiTeam"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{crear_paquete}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Escalas de medición
+
+La idea de la media es algo natural en el hombre. La medida surge de la comparación. Galileo Galilei dijo: "Mide lo que se puedas medir; y lo que no, hazlo medible", Lord Kelvin en el siglo XIX dijo: "Cuando uno puede medir aquello de lo que se está hablando y expresarlo en números, se sabe algo acerca de ello; pero cuando no puede medirlo, cuando no puede expresarlo en números, su conocimiento es escaso e insatisfactorio, esto podría ser un principio de conocimiento pero escasamente este conocimiento ha avanzado a la etapa de una ciencia". La idea fundamental de la medida es una "función".
+La medición tiene tres propiedades que brindan congruencia entre los hechos y el concepto teórico que son objeto de estudio. Estas propiedades son: validez, consistencia y objetividad. Una medida es válida cuando mida lo que pretende medir. Una medida es consistente cuando se tienen mediciones repetidas sobre un fenómeno y arrojan resultados iguales. Una medida es objetiva cuando dos observadores diferentes toman medidas sobre un fenómeno y sus resultados no difieren.
+
+La medición existe en una variedad de formas y las escalas de medición caen en ciertas clases definidas. 
+
+Una primera clasificación de los datos puede ser cualitativos (cualidades) y cuantitativos (cantidades).Una clasificación más exhaustiva, se pueden dividir en cuatro grandes escalas de medición: nominal, ordinal, de intervalo y de razón. 
+
+            -Variables cualitativas: Nominal u Ordinal.
+            -Variables cuantitativas: Intervalo o de Razón.
+            
+Stevens publicó en 1946 en al revista *Science* un artículo titulado *On the theory of scales of measurement* en donde propone una clasificación que contempla cuatro tipo básicos de mediciones.
+
+Las escalas de medición es una pirámide dónde la primera escala es la *nominal*, el segundo peldaño es la escala de *ordinal* , el tercer escalón es la escala de *intervalo* y el cuarto escalón es la escala de *razón*.
+
+
+##Datos cualitativos
+
+Los datos cualitativos son mediciones de cualidades, el resultado de observar un carácter cualitativo se le denomina atributo o variable cualitatitiva. Las unidades de análisis varían cualitativamente con respecto a una determinada características y se pueden clasificar en categorías o modalidades. Los atributos pueden ser dicotómicos, caracterizados por la presencia/ausencia de una propiedad o politómicos.
+
+Para clasificar las unidades de análisis es necesario que las categorías cumplan lo siguiente:
+  1) Deben estar bien definidas.
+  2) Ser mutuamente excluyentes (solo pertenece a una categoría).
+  3) Ser exhaustivas (todo elemento esta en alguna categoría)
+  
+Una clasificación exhaustiva de los datos cualitativos son: nominales u ordinales.
+
+###Escala Nominal
+
+En la escala de medición nominal, los números representan una clasificación, por lo general son datos discretos. Las variables que están medidas en esta escala, solo se puede realizar conteos de frecuencias. Las únicas relaciones matemáticas adecuadas son las de equivalencia o no equivalencia. Una unidad de análisis puede tener la característica que define la clase o no la tiene. Este nivel de medición tiene el nivel más bajo.
+La única operación válida con esos números es el conteo de las frecuencias absolutas y posteriormente la obtención de frecuencias relativas. Con la disposición de frecuencias es válida la identificación del valor que aparece con mayor frecuencia y la realización de pruebas cuyos datos de ingreso son frecuencias como aquellas basadas en la Binomial, Multinomial o Ji cuadrada.
+
+Por ejemplo en la base de datos 'Adult Data Set' tenemos variables medidas en escala nominal. 
+
+```{r}
+
+adult <- read.csv("./adult.txt",header=FALSE)
+names (adult) = c("age", "workclass", "fnlwgt", "education",
+"education_num", "marital_status", "occupation", "relationship",
+"race", "sex", "capital_gain", "capital_loss", "hours_per_week", "native_country","uji")
+
+adult <-adult[complete.cases(adult),]
+```
+
+Si observamos las tablas de frecuencias de todas las variables tenemos que la variable: age, workclass, fnlwgt, education, education_num, marital_status, occupation, relationship, relationship, race, sex, native_country y v15.
+
+```{r}
+v1 <- as.data.frame(table(age=adult[,1]))
+v2 <- as.data.frame(table(workclass=adult[,2]))
+v3 <- as.data.frame(table(fnlwgt=adult[,3]))
+v4 <- as.data.frame(table(education=adult[,4]))
+v5 <- as.data.frame(table(education_num=adult[,5]))
+v6 <- as.data.frame(table(marital_status=adult[,6]))
+v7 <- as.data.frame(table(occupation=adult[,7]))
+v8 <- as.data.frame(table(relationship=adult[,8]))
+v9 <- as.data.frame(table(race=adult[,9]))
+v10 <- as.data.frame(table(sex=adult[,10]))
+v14 <- as.data.frame(table(native_country=adult[,14]))
+v15 <- as.data.frame(table(uji=adult[,15]))
+```
+
+
+###Escala ordinal
+
+La escala de medición ordinal, los números representan una clasificación pero se puede ordenar. En esta escala los números pueden servir para representar la posición de una serie o para indicar el rango ordenado de los elementos. Podemos ordenar las unidades de análisis.
+
+Las operaciones que están permitidas o que tienen algún significado, es la relación que se expresa en términos del álgebra de las desigualdades es decir, existe transitividad (A>B>C -> A>C).
+
+Entre las pruebas estadísticas que se basan en este tipo de escala se pueden mencionar las asociadas a coeficiente de correlación por rangos, como el de Spearman y el de Kendall, la prueba de la Mediana y la U de Mann y Whitney.
+
+Por ejemplo en la base de datos *Adult Data Set* las variables que tienen un tipo de medición ordinal son: age y education.
+
+```{r}
+v4 <- as.data.frame(table(education=adult[,4]))
+v1 <- as.data.frame(table(age=adult[,1]))
+```
+
+##Datos cuantitativos
+
+Los datos cuantitativos son mediciones de cantidades. Cuando no solamente es posible distinguir la diferencia entre los diversos grados de propiedad de un objeto (características de la medida ordinal) sino también puede discernirse las diferencia entre objetos iguales, se recurre a la medida de intervalo.
+
+
+###Escala de Intervalo
+
+La medición en una escala de intervalo consiste en asignar un número de unidades de análisis (elementos) para indicar su posición exacta a lo largo de una escala continua. Este tipo de escala nos permiten decir qué distancia separa a un elemento de otro. Los números pueden servir para indicar las diferencias entre los elementos (número reales).
+
+Las medidas de intervalo, implican la asignación de números de modo tal, que a iguales diferencia entre los grados del atributo de un objeto, correspondan iguales diferencias entre los números. Una de las características es que el cero (0) no implica ausencia del atributo, el cero es arbitrario.
+
+Valores medios en escala intervalar son susceptibles de cálculo para todo tipo de estadística como media aritmética, media geométrica, varianza, desviación estándar, coeficiente de correlación producto momento de Pearson.
+
+
+###Escala de Razón
+
+En la escala de razón la idea central es que el cero es absoluto, el cero significa la usencia de la característica observada. A iguales diferencias entre los números asignados, corresponden iguales diferencias en el grado de atributo presente en el objeto de estudio. Los números pueden servir para indicar las proporciones entre los elementos (números reales).
+
+Las operaciones permitidas son: suma, resta multiplicación y división, es decir, diferencias iguales entre puntos de cualquier parte de la escala son iguales entre si.
+
+Otra característica de las escalas de orden superior (Razón) es que se pueden transformaR fácilmente en escalas de orden más bajo.
+
+
+Por ejemplo en la base de datos *Adult Data Set*, las siguientes variables están medidas en escala de razón: capital_gain, capital_loss y hours_per_week.
+
+```{r }
+v11 <- as.data.frame(table(capital_gain=adult[,11]))
+v12 <- as.data.frame(table(capital_loss=adult[,12]))
+v13 <- as.data.frame(table(hours_per_week=adult[,13]))
+```
+
+
+Stevens propone la siguiente tabla resumen de las propiedades de escala de medición.
+
+
++------------+------------------+--------------------+-----------------------------+
+|   Escala   |    Localización  |      Dispersión    |            Asociación       |
++============+==================+====================+=============================+
+| Nominal    | Moda             |Frecuencia,         |Coef. contiengencia,         |
+|            |                  |Indice de Shannon H |Corr. tetracórica,          |
+|            |                  |                    |Indice de inf. transmitida T |
++------------+------------------+--------------------+-----------------------------+
+| Ordinal    | Mediana          |Percentiles,        |Coef. corr. Spearman         |
+|            |                  |Rangos semicuartil  |                             |
++------------+------------------+--------------------+-----------------------------+
+| Intervalo  | Media aritmética |Desviación media ,  |Coef. corr. de Pearson       |
+|            |                  |Desviación estándar,|                             |
+|            |                  |Varianza            |                             |
++------------+------------------+--------------------+-----------------------------+
+|            |                  |Coeficientes de     |                             |
+|            | Media geométrica |variación,          |                             |
+| Razón      | Media armónica   |Error estándar      |                             |
++------------+------------------+--------------------+-----------------------------+
+
+
+#Medidas de distancia
+
+## Medidas de distancia para variables de intervalo y de razón
+
+Medidas de disimilaridad entre individuos. Algunas medidas de disimilaridad entre individuos para *p* variables cuantitativas son:
+
+* 1. Distancia euclidiana
+
+$$d_{ij}=\sqrt{\sum_{k=1}^{p} (x_{ik}-x_{jk})^2}$$
+Si calculamos la matriz de distancia para la variable *hours_per_week*.
+
+
+* 2. Distancia euclidiana escalada 
+
+$$d_{ij}=\sqrt{\sum_{k=1}^{p} w_k(x_{ik}-x_{jk})^2}$$
+
+* 3. Distancia Minkowski
+
+$$ d_{ij}=(\sum_{k=1}^{p}\mid x_{ik}-x_{jk}\mid^\lambda)^\frac{1}{\lambda}$$
+
+
+* 4. Distancia de Canberra
+
+$$d_{ij}=\sum_{k=1}^{p}\frac{\mid x_{ik}-x_{jk} \mid}{\mid x_{ik}\mid + \mid x_{jk} \mid}$$
+
+
+## Medidas de distancia para variables cualitativas 
+
+Los datos dicotómicos se caracterizan por tener sólo dos posibles estados. Existen variables simétricas y asimétricas.
+Las variables binarias se pueden representar en tablas de contingencia. La suma de *a+b+c+d* equivalen al número de variables.
+
+
+
+| 1 | 0 | 
+|---|---|
+| a | b | 
+| c | d |
+
+
+
+
+Por ejemplo en la base de datos *Adult Data Set * podemos realizar una tabla de contingencia.
+```{r}
+ftable(adult$sex, adult$uji)
+```
+
+
+Algunas medidas de disimilitud entre individuos para variables dicotómicas son:
+
+
+* 1. Medida de concordancia simple (variables simétricas)
+Esta medida equivale a la proporción de las variables en donde los individuos no coinciden.
+
+$$d_{ij}=1-\frac{a+d} {p}=\frac{b+c}{p}$$
+
+* 2. Coeficiente de Czekanowski
+
+Este coeficiente se enfatiza la presencia de las características. Al igual que el anterior es adecuado para variables asimétricas.
+
+$$d_{ij}=\frac {b+c} {2a+b+c}$$
+Utilizando la tabla de contingencia tenemos:
+$$d_{ij}=\frac{1179+15128} {2*9592+1179+15128}=0.4594686$$$
+
+
+* 3. Coeficiente de Jaccard
+
+Este cociente nos ayuda a medir la similitud entre dos conjuntos, en este caso conjuntos de variables observadas sin precisar que tipo de variables son. Es por ello que lo podemos utilizar para datos categóricos.
+
+$$
+J(A,B)= \dfrac{A \cap B}{A \cup B}
+$$
+El número de elementos que ocurren en ambos conjuntos u observaciones dividido por el número total de elementos en los conjuntos menos su intersección. Veamos un ejemplo en nuestra base de datos adults, para ver como difieren dos individuos. Distancia de Jaccard en una muestra de 100 observaciones
+
+```{r}
+library('clusteval')
+library('arules')
+data("Adult")
+set.seed(127049)
+adult_s <- sample(Adult, 2)
+## calculate Jaccard distances and do hclust
+d_jaccard <- dissimilarity(adult_s)
+d_jaccard
+```
+Vemos como entre dos individuos tenemos que para sus variables categóricas tienen un coeficiente de disimilitud de jaccard de 0.75. Ahora, lo podemos hacer para más individuos, supongamos que ahora tenemos una muestra de tamaño 10.
+```{r}
+library('clusteval')
+library('arules')
+data("Adult")
+set.seed(127049)
+adult_s10 <- sample(Adult, 10)
+d_jaccard10 <- dissimilarity(adult_s10)
+d_jaccard10
+```
+Y podemos observar las diferentes interacciones entre la similitud de los individuos. Para ilustrarlo mejor, vamos a hacer agrupamiento jerárquico mediante "ward.D2" o el criterio de Murtagh & Legendre, criterio con el cual las disimilitudes i.e las suma de cuadrados de errores se cuadran antes de la actualización del grupo. Es algo intuitivo pensar que en este caso la distancia va más allá de una geometría métrica.
+
+Pero para entender las disimilitudes entre grupos, recordamos que una distancia es positiva y simétrica para un par de vectores de una observación sobre los reales positivos que además satisface la desigualdad triangular. Sin embargo, aquí pedir la desigualdad triangular es algo fuerte, entonces definimos una distancia ultramétrica bajo los primeros dos supuestos anteriores y además definimos una agrupación jerárquica de tal modo que se cumpla la siguiente desigualdad.
+
+
+
+$$ d_j (i, j) ≤ max \{d_j (i, k), d_j (k, j)\}$$
+Entonces, así construimos el siguiente dendograma para ver como según su similitud se van agrupando los clusters
+
+```{r}
+hc <- hclust(d_jaccard10, method = "ward.D2")
+plot(hc, main = "Dendograma de interacciones")
+```
+
+obtendremos 10 clusters para mirar en las barras la diferencia de las frecuencias de los artículos y para los 10 primeros artículos en el grupo 1 en comparación con los datos será la interpolación lineal.
+
+```{r}
+assign <- cutree(hc, 10)
+itemFrequencyPlot(adult_s10[assign==1], population=adult_s10, topN=10)
+```
+
+
+## Medidas de distancia para variables de distintas escalas
+
+Existen dos principales alternativas para obtener la matriz de distancia cuando las variables son de diferente tipo (cuantitativas y cualitativas). La primera consiste en calcular las disimilidades entre las variables del mismo tipo y posteriormente calcular un promedio (ponderado). Otra alternativa es utilizar el coeficiente de similitud de *Gower* par aobtener una medida de disimilitud. Este coeficiente de similitud se obtiene como:
+
+$$ c_{ij}=\frac{\sum_{k=1}^{p} s_{ijk}}{\sum_{k=1}^{p} \delta_{ijk}}$$
+donde s_{ijk} es la similitud del individuo *i* con el individuo *j* respecto a la variable *k* y
+
+
+
+
+
+```{r,echo=FALSE}
+adult <- read.csv("./adult2.txt", header=FALSE)
+names (adult) = c("age", "workclass", "fnlwgt", "education", "education_num", "marital_status", "occupation", "relationship","race", "sex", "capital_gain", "capital_loss", "hours_per_week", "native_country","ingreso_anual")
+```
+
+```{r,echo=FALSE}
+
+adult_trabajo<-adult[,-c(1,3,5,11,12,13)]
+
+for (i in 1:9){adult_trabajo[[i]]<-as.vector(adult_trabajo[[i]])}
+
+adult_trabajo<-as.data.frame(adult_trabajo)
+
+for (i in 1:9){adult_trabajo[[i]]<-replace( adult_trabajo[[i]],  adult_trabajo[[i]]==" ?",NA )}
+adult_trabajo<-adult_trabajo[complete.cases(adult_trabajo),]
+                            
+                          
+```
+
+##Distancia para datos categoricos nominales
+
+El objetico es comparar los atributos categorios de dos individuos X1 y X2 simultaneamente. Es imposible comparar directamente 2 individuos con un unico atributo categórico nominal de manera objetiva. Con un conjunto de atributos categoricos nominales podemos ver la distancia entre ellos de esta forma:
+
+
+$$D(X_{1},X_{2})=1-\frac{1}{N}\sum_{i=1}^N 1(X_{1i}= X_{2i}) $$
+  donde  N:numeros de attributos categoricos
+  
+  
+  En los datos de  adult de UCI tenemos N=9 attributos categoricos,
+  
+```{r,echo=FALSE}
+
+head(adult_trabajo)
+
+```
+ 
+  Hay atributos que no se pueden usar numéricamente para tratarles como distancias sin dar sentido o dar una estructura posible o sin perder información:      
+  **workclass|marital_status|occupation|relationship|native_country**
+
+
+
+  _Ejemplo_:
+  
+Agregamos los atributos categóricos binarios (sex y ingreso_anual) y ordinal (education) para calcular esta distancia.
+  
+Vamos a ver la distancia entre 1 y los otros hasta el individuo 10
+
+```{r,echo=FALSE}
+adult_trabajo[1:10,]
+```
+
+
+```{r,echo=FALSE}
+
+distancia_nominal<-function(X,Y){
+  a=0
+  for (i in 1:9){
+  if(X[i]==Y[i]){a=a+1}
+  }
+ return(1-(a/9))
+}  
+  
+  
+
+
+```
+```{r,echo=FALSE}
+for (i in 1:12){
+print(paste("D(X_",1," , X_",i,")=",round(distancia_nominal(adult_trabajo[1,],adult_trabajo[i,]),2)))}
+
+
+```
+
+
+El problema si no tenemos cuidado es tener una capacidad de discriminación débil con esta distancia. Esto es porque los valores son los mismos.
+
+Sin embargo, el dataset de Adult de UCI es utilizado para clasificar con la función objetivo ingreso anual (mas de 50k o no).Entonces con un estudio previo sobre los datos (arbol de decision , feature selecion) o interpretacion sociologico podemos añadir pesos para cada attributos.
+
+Lo que significa que un persona A puede ser mas similar a B para un problema dado (aqui el salario anual) que C a pesar que B tiene el mismo número de atributos idénticos que A o mas.
+ 
+ Con pesos podemos definir una nueva distancia:
+ 
+ 
+ $$D(X_{1},X_{2})=1-\sum_{i=1}^N 1(X_{1i}= X_{2i}) * W_{i} $$
+ 
+ 
+ donde $$\sum_{i=1}^N W_{i} =1$$
+ 
+ 
+Por ejemplo, si consideramos, subjetivamente, que el nivel de educación y el ocupación son parámetros importantes para el salario anual pues podemos considerar  para el peso del attributo trabajo 0.2 y 0.15 para el peso del nivel de educación y los otros con 0.092986.
+
+
+```{r,echo=FALSE}
+
+w<-c(0.092986,0.15,0.092986,0.2,rep(0.092986,5))
+
+
+distancia_nominal_peso<-function(X,Y){
+  a=0
+  for (i in 1:9){
+  if(X[i]==Y[i]){a=a+1*w[i]}
+  }
+ return(1-(a))
+}  
+
+```
+
+```{r,echo=FALSE}
+adult_trabajo[c(1:10),]
+
+```
+
+Comparemos el primero con los otros:
+
+```{r}
+
+for (i in 1:10){
+print(paste("D(X_",1," , X_",i,")=",round(distancia_nominal_peso(adult_trabajo[1,],adult_trabajo[i,]),2)))}
+
+```
+
+
+##Representacion de los datos en R
+
+####fijos binarios/Booleanos:  
+- logical (TRUE/FALSE)
+- DOUBLE (0/1)
+
+####Datos categóricos o nominales:
+- Character ("Paris")
+- Vector de 0 y 1
+
+####Datos Ordinales:
+- Character ("Bueno", "Malo", "Hrorrible")
+- Double
+
+####Datos Numéricos:
+- Double
+
+Podemos juntar los datos con un:
+####vector c(TRUE, FALSE) 
+Y es obligatorio tener el mismo dentro de un vector, podemos hacer varias operaciones.
+
+####Factores
+- Almacena variables cualitativas
+- Almacena elementos de tipos diferentes
+- Tiene atributo de nivel (conjunto posible de valores dentro del factor)
+
+####Matrices
+Todos los elementos son del mismo tipo
+
+####Dataframe
+Es mas complejo que una matriz. Los elementos de una columna son todos del mismo tipo y cada columna puede tener un tipo diferente
+
