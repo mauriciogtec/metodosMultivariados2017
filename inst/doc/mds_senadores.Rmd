@@ -1,0 +1,154 @@
+---
+title: "MDS: Multidimensional Scaling"
+author: "Mauricio Garcia Tec"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{MDS: Multidimensional Scaling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+El objetivo de esta técnica va a ser reconstruir los datos a partir de la matriz de distancia cuando no tenemos los datos y solo la matriz de distancias. Esta técnica es muy usada porque muchas veces tenemos observaciones de las cuales solo tenemos una medida de similitud o disimilitud entre los individuos pero no hay coordenadas en las cuales visualizarlos. Una vez creando las coordanadas se pueden incluir en otros análisis como clusterización, k-vecinos, regresiones, etc.
+
+Las coordenadas que vamos a construir de las matrices de distancias resultarán ser centradas.
+
+## Motivación
+
+Supongamos que tenemos los siguientes datos (dos columnos de iris). Lo que queremos ver primero es la relación entre la los datos y la distancia entre los "individuos" de la base de datos. Para simplificar las cosas, vamos a centrar los datos.
+
+```{r}
+library(knitr)
+```
+
+```{r}
+data(iris)
+X <- scale(iris[1:5, 1:2], center = TRUE)
+X
+```
+
+Observemos esta identidad entre la matriz de productos puntos y una matriz formada por una transformación de las distancias cuadradas.
+
+La matriz de productos puntos es 
+$$ XX^t $$
+su entrada $(i,j)$ es $x_i^tx_j$ donde $x_i$ es el vector del individuos $i$; en este caso $x_i = (Sepal.length_i, Sepal.Width_i)$ que es `X[i, ]`.
+
+```{r}
+# Matriz de productos puntos
+X %*% t(X)
+```
+
+Ahora la matriz de distancias cuadradas doble centradas escaladas que llamaremos $B$ es
+```{r}
+dist_squared = as.matrix(dist(X))^2 # cada elemento elevado al cuadrado
+n_ind <- nrow(X)
+for (i in 1:n_ind) {
+  dist_squared[i, ] <- dist_squared[i, ] - mean(dist_squared[i, ])
+}
+for (j in 1:n_ind) {
+  dist_squared[ ,j] <- dist_squared[ ,j] - mean(dist_squared[ ,j])
+}
+B = -0.5 * dist_squared
+B
+```
+
+La conclusión es que $B = XX^t$.
+
+La idea de este análisis es que muchas veces solo tenemos las distancias y por lo tanto $B$, pero queremos artificialmente encontrar unas coordenadas $X$. Para eso usamos descomposición svd. Pues si $B = P \Delta P^t$, y si $\Delta$ tiene todas sus entradas no negativas (que se puede mostrar que pasa siempre si las distancias son euclidianas), entonces $B$ se escribe
+$$
+B = P \Delta^{1/2}\Delta^{1/2} P^t = (P\Delta^{1/2})(P\Delta^{1/2})^t.
+$$
+donde $\Delta^{1/2}$ tiene diagonal igual a las raíces de los elementos de la diagonal de $\Delta$. 
+
+#### Conclusión 
+
+De la diagonalización de $B$, podemos encontrar coordenadas que simulen $X$ podemos poner $X = P\Delta^{1/2}$. La matriz $X$ resultante tiene tantas columnas como individuos haya, pues $B$ es de tamaño $n\times n$ con $n$ el número de individuos.
+
+Ahora bien, en la práctica solo queremos algunas coordenadas, por ejemplo, 2 coordenadas. Entonces podríamos los primeros 2 o $k$ eigenvectores (las columnas de $P$) y las raíces de los primeros 2 o $k$ eigenvalores en matrices 
+$$P_k = P[ ,1:k] \quad \text{y} \quad \Delta_k^{1/2} = \Delta^{1/2}[ ,1:k]$$
+y la aproximación
+$$
+X = P_k\Delta_k^{1/2} = \left[P^1\sqrt{\lambda_1} | ... | P^k\sqrt{\lambda_k}\right]
+$$
+
+## Ejemplo: datos del senado
+
+```{r}
+library(metodosMultivariados2017)
+data(senado_votacion)
+data(senado_partidos)
+```
+
+```{r, eval = FALSE}
+help(senado_votacion)
+```
+
+```{r, eval = FALSE}
+help(senado_partidos)
+```
+
+No tenemos ni matriz de datos $X$ para representar en coordenadas a cada senador ni tenemos una matriz de distancias. Sin embargo, podemos construir una matriz de disimilitud a partir de cuántas veces votan de forma distinta los senadores.
+
+```{r}
+votos <- senado_votacion[ ,-(1:3)]
+disagreement <- matrix(0, nrow = ncol(votos), ncol = ncol(votos))
+for (i in 1:(ncol(votos)-1)) {
+  for (j in (i+1):ncol(votos)) {
+    disagreement[i, j] <- 1 - sum(votos[ ,i] == votos[ ,j], na.rm = TRUE) / ncol(votos)
+    disagreement[j, i] <-  disagreement[i, j]
+  }
+}
+disagreement[1:4, 1:4] # ejemplo
+```
+
+La técnica es suponer que esta medida de disagreement fuera una distancia euclidiana como en la introducción.
+
+```{r}
+dist_squared = disagreement^2 # cada elemento elevado al cuadrado
+n_ind <- nrow(disagreement)
+for (i in 1:n_ind) {
+  dist_squared[i, ] <- dist_squared[i, ] - mean(dist_squared[i, ])
+}
+for (j in 1:n_ind) {
+  dist_squared[ ,j] <- dist_squared[ ,j] - mean(dist_squared[ ,j])
+}
+B = -0.5 * dist_squared
+B[1:4, 1:4] # ejemplo
+```
+
+Ahora la diagonalizamos
+
+```{r}
+decomp <- eigen(B)
+k <- 2
+Pk <- decomp$vectors[ ,1:k]
+Deltarootk <- diag(sqrt(decomp$values[1:k]))
+X <- Pk %*% Deltarootk
+```
+
+La matrix $X$ guarda las coordenadas artificiales para cada uno de mis senadores. Podemos visualizarla en un scatter plot, y combinarla con información de partidos.
+
+```{r, warning=FALSE, message=FALSE}
+library(dplyr)
+library(plotly)
+```
+
+```{r}
+plot_data <- data.frame(
+  SENADOR = names(votos),
+  comp1 = X[ ,1],
+  comp2 = X[ ,2],
+  stringsAsFactors = FALSE
+)
+plot_data <- left_join(plot_data, senado_partidos, by = "SENADOR")
+head(plot_data)
+```
+
+```{r, fig.width = 6}
+p <- plot_ly(plot_data, x = ~comp1, y = ~comp2, color = ~PARTIDO, text =~SENADOR,
+             colors = c("blue", "yellow", "green","red","orange","gray","black")) %>%
+  add_markers()
+p
+
+```
+

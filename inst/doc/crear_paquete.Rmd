@@ -1,0 +1,309 @@
+---
+title: "Hacer y documentar un paquete de R en 20 minutos"
+author: "Mauricio García Tec"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{crear_paquete}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+![](crear_paquete/fast.png)
+
+
+## ¿De qué es este tutorial?
+
+Esta es una guía para crear un paquete de R y documentarlo de manera práctica y sencilla. Cualquier persona con conocimiento básico de R puede crear su paquete gracias al paquete `devtools` creado por el equipo de R y RStudio en conjunto.
+
+Como ejemplo, voy a crear un paquete llamado *metodosMultivariados2017*, que usaré este semestre en el curso de maestría *Métodos Multivariados en Ciencias de Datos y Estadística* impartido en el Instituto Tecnológico Autónomo de México (ITAM) en la primavera de 2017. 
+
+Este tutorial es útil para cualquier persona interesada en crear un paquete--no solo estudiantes de la clase--y es fácil de leer. 
+
+#### Prerequisitos
+Tener instalado R (este tutorial está hecho con la versión 3.3.2) y los paquetes `devtools` y `roxygen2`. Si están en Windows, necesitarán adicionalmente instalar `Rtools`, que se descarga como un instalable de la página principal de R, aquí un [link](http://cran.itam.mx/bin/windows/Rtools/) al CRAN del ITAM. Se recomienda usar [RStudio](https://www.rstudio.com/) por comodidad, pero no es necesario. Versiones recientes de  Rstudio descargan `Rtools` por ustedes la primera vez que lo necesiten.
+
+## 1. El esqueleto del paquete
+
+Lo primero que tenemos que hacer es crear la estructura del paquete. Para los interesado en entender que está detrás de lo que vamos a hacer, recomiendo dar una lectura rápida a
+
++ [Documentación de R (Writing R extensions)](https://cran.r-project.org/doc/manuals/r-release/R-exts.html)
++ [Documentación de RStudio (Developing Packages with RStudio)](https://www.google.com.mx/url?sa=t&rct=j&q=&esrc=s&source=web&cd=3&cad=rja&uact=8&ved=0ahUKEwiW957hy8zRAhULxLwKHYbKAFIQFggrMAI&url=https%3A%2F%2Fsupport.rstudio.com%2Fhc%2Fen-us%2Farticles%2F200486488-Developing-Packages-with-RStudio&usg=AFQjCNEaqKt4dLYm2gP4UxyuUy5MxWMDPQ)
+
+Para crear la estructura del paquete lo único que tenemos hacer es correr la función `devtools::create` e incluir el *path* (dirección) donde queremos crear el paquete y el nombre, en mi caso, crearé el paquete `metodosMultivariados2017` en la carpeta `C:/Github/`. Pueden cambiar `metodosMultivariados2017` por el título de su paquete, el código en mi caso resultante es:
+
+```{r, eval = FALSE}
+devtools::create(path = "D:/Github/metodosMultivariados2017") 
+```
+
+
+
+Con esto se creará una carpeta con el nombre del paquete en la dirección específicada con dos archivos --`DESCRIPTION` y `NAMESPACE`--y una subcarpeta `R/` donde guardaremos las funciones que estarán en el paquete. 
+
+```
+metodosMultivariados2017/ 
+  |-- metodosMultivariados2017.Rproj
+  |-- DESCRIPTION
+  |-- NAMESPACE
+  |-- R/
+```
+Si están en Rstudio y saben usar proyectos, notarán que se creará tamibén un proyecto en la carpeta con el mismo nombre del paquete, si lo abren, automáticamente cambiára el directorio de trabajo al del paquete y Rstudio habilitará las herramientas de desarrollo. Si no están en Rstudio, deberán cambiar el directorio de trabajo a la nueva carpeta creada para el paquete, en mi caso, `D:/Github/metodosMultivariados2017/`.
+
+Veamos que son los archivos creados.
+
+#### DESCRIPTION
+
+Este archivo contiene la información general del paquete: datos como el autor, quién lo mantiene, la versión, las dependencias, etc. Inicialmente se ve así:
+
+```yaml
+Package: metodosMultivariados2017
+Title: What the Package Does (one line, title case)
+Version: 0.0.0.9000
+Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.3.2)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+
+```
+Debemos cambiar el título, versión, autor y descripción del paquete, pueden asimismo incluir una licencia. Las entradas de `Encoding` y `LazyData` pueden quedarse como están.
+
+El campo `Depends` es el más dificil de difícil de entender. Su función es controlar el sistema de dependencias, es decir, incluir aquellos paquetes necesarios para que nuestro paquete sirva. El problema es que con el tiempo, la manera oficial recomendada por el equipo de R de trabajar las dependencias ha ido cambiando con el tiempo y hoy en día se recomienda dejar intacto el campo `Depends` y agregar en cambio un nuevo campo llamado `Imports` que por el momento estaría vacío.  En el campo `Imports` debemos listar todos los paquetes que deben ser instalados justo con nuestra paquetería. El archivo DESCRIPTION deberá por lo tanto quedar como sigue.
+
+```yaml
+Package: metodosMultivariados2017
+Title: Paquete del Curso Metodos Multivariados 2017 - ITAM
+Version: 0.1
+Authors@R: person("Mauricio", "Garcia", email = "mauriciogtec@gmail.com", role = c("aut", "cre"))
+Description: Este paquete contiene el codigo generado en clase y los datasets oficiales. Se utiliza como metodo de distribucion de materiales del curso y tambien para ejemplificar la construccion de paquetes de R y su documentacion usando roxygen2 a traves de devtools.
+Depends: R (>= 3.3.2)
+Imports:
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+```
+
+#### NAMESPACE
+
+El propósito de este archivo es incluir los nombres de las funciones que estarán disponibles para los usuarios cuando carguen el paquete así como incluir las funciones de otros paquetes que nosotros podremos usar en nuestra programación sin necesidad de usar el operador `::`. 
+
+El archivo NAMESPACE inclye una lista de *exports*/*imports*.
+
+- Los *exports* son todas las funciones definidas en la paquetería o importadas de otras paqueterías que queremos que el usuario del paquete pueda usar. 
+- Los *imports* se usan cuando el código de nuestras funciones depende muchísimo de funciones de otros paquetes; muy rara vez se usan porque la buena práctica al programar paquetes es escribir una función de la forma `paquete::funcion(args)` en vez de `library(paquete)` seguido de `funcion(args)`; evitando problemas generados cuando los nombres de nuestras funciones o de las funciones que usamos se duplican en el ambiente de trabajo.
+
+<em>**¡OJO!**: Este archivo **NUNCA** lo modificaremos manualmente gracias a `devtools`--más especificamente, al paquete `roxygen2` llamado por `devtools`--Para nosotros, definir el NAMESPACE y documentar serán parte de la misma tarea.</em>
+
+## 2. Creando y documentando funciones
+
+Vamos a comenzar creando una función llamada `timesTwo` y la vamos a poner en un *script* llamado `timesTwo.R` dentro de la carpeta  `R/` de nuestro paquete.
+
+La función queda
+
+```
+metodosMultivariados2017/ 
+  |-- metodosMultivariados2017.Rproj
+  |-- DESCRIPTION
+  |-- NAMESPACE
+  |-- R/
+  |-- |-- timesTwo.R
+```
+
+
+```{r, eval = FALSE}
+timesTwo <- function(x) {
+  2*x
+}
+```
+
+<em>**Una nota**: En realidad no hay ninguna necesidad de que está función esté en un archivo llamado `timesTwo.R`, por defecto, al construir el paquete se buscarán *todas* las funciones de la carpeta `R/` sin importar el nombre del archivo en el que estén. Incluso puede haber muchas funciones o todas en un mismo archivo. Lo hicimos aquí de esta manera para que la práctica sea más clara y ordenada.</em>
+
+Aún no hemos visto como "construir" el paquete una vez que añadimos funciones. Si construyésemos el paquete en este momento la función no estaría disponible todavía porque no está en el NAMESPACE. En viejos tiempos, tendríamos que poner un comando `export(timesTwo)` en el archivo NAMESPACE para lograrlo.  Pero *No* haremos esto, mataremos dos pájaros de un tiro usando `roxygen2` y documentaremos la función, manejando el NAMESPACE al mismo tiempo, haciendo las cosas más sencillas.
+
+#### Documentando timesTwo
+
+
+Una de las ventajas de tener un paquete es que nos obligamos a documentar nuestras funciones. Es muy común que olvidemos cuál era el objetivo o los usos de algunas de nuestras funciones si no documentamos.
+
+Si han usado R entonces están familiarizados con las funciones de ayuda `?` o mejor aún `help`. Lo que queremos es que el usuario pueda consultar la documentación de las funciones de nuestro paquete usando `?` y `help`, o incluso correr ejemplos.
+
+En un mundo sin paquetes, la práctica mundana para recordar el propósito de una función al programar es incluir comentarios previos su definición, por ejemplo:
+
+```{r, eval = FALSE}
+# esta funcion multiplica por dos
+timesTwo <- function(x) {
+  2*x
+}
+```
+
+La idea que inspira a `roxygen2` es usar directivas que parecen comentarios antes de la función y dejar que un interprete cree toda la documentación necesaria por nosotros y la ponga en las carperas correctas para que al cargar el paquete puedan consultarse con `?`. En el pasado, para documentar una función había que crear documentos de Latex y ponerlos en una carpeta llamada `man/`, hoy simplemente tenemos que usar estos comentarios/directivas en todas nuestra funciones en la carpeta `R/` y tagearlos con campos correspondientes a la documentación.
+
+Por ejemplo, para documentar la función `timesTwo` podemos hacer lo siguiente
+
+```{r, eval = FALSE}
+#' @title Multiplicar por dos
+#' @description Esta es una funcion de ejemplo para multiplicar un valor o vector \code{x} por dos.
+#' @param x un elemento o vector numerico
+#' @details Esta funcion es parte del tutorial para hacer paquetes del curso de Metodos Multivariados 2017
+#' en el ITAM. La funcion recibe un elemento \code{x} que puede ser un numero o un vector numerico y lo devuelve
+#' multiplicado por dos. La documentacion de ayuda es generada usando roxygen2.
+#' @examples
+#' timesTwo(3)
+#' timesTwo(0:10)
+#' @export
+timesTwo <- function(x) {
+  2*x
+}
+
+```
+
+Algunas observaciones:
+
+- Los comentarios están marcados con `#'` en vez de `#`. Por un lado, al comenzar con `#`, son comentarios comunes, por lo que no interfieren a la hora de correr código. Por otro lado, incluir el apóstrofe  `'` da la instrucción a  `roxygen2` de interpretar esas directivas.
+- Los *tags* de la documentación son marcados con el símbolo `@` y corresponden directamente a los campos de la documentación de ayuda.
+- El único tag que no pertenece a la documentación es `@export`. Este es el *tag* que indica a `roxygen2` poner está función en el NAMESPACE para exportarla.
+- Funciones que no tengan `@export` pueden ser utilizadas por otras funciones dentro del paquete, pero no por el usuario que cargue la librería directamente.
+
+#### Construyendo el paquete
+
+Es momento de utilizar `devtools` para construir y documentar el paquete. Esto se logrará através de dos comandos 
+
+```{r, eval = FALSE, echo = FALSE}
+devtools::document()
+devtools::install()
+```
+
+El paquete está listo, ahora sí podemos probarlo
+
+```{r}
+library(metodosMultivariados2017)
+timesTwo(3)
+```
+```{r}
+example(timesTwo)
+```
+
+Ahora veamos si la ayuda de la función `timesTwo` y de nuestro paquete
+
+```{r, eval = FALSE}
+help(package = "metodosMultivariados2017")
+```
+
+![](crear_paquete/help_package.PNG)
+
+```{r, eval = FALSE}
+help(timesTwo)
+```
+
+![](crear_paquete/help_timesTwo.PNG)
+
+#### Las modificaciones hechas por roxygen2
+
+Al documentarse el paquete, automáticamente se crearon nuevos archivos en formato `.Rd` y sintaxis de `.tex` en la carpeta de documentación o manuales `man/`. Actualmente la estructura del paquete es:
+
+```
+metodosMultivariados2017/ 
+  |-- metodosMultivariados2017.Rproj
+  |-- DESCRIPTION
+  |-- NAMESPACE
+  |-- R/
+  |-- |-- timesTwo.R
+  |-- man/
+  |-- |-- timesTwo.Rd
+```
+
+y el archivo NAMESPACE ahora dice
+
+```{r, eval  = FALSE}
+# Generated by roxygen2: do not edit by hand
+
+export(timesTwo)
+```
+
+
+## 4. Funciones que dependen de otros paquetes 
+
+En este momento debemos estar muy felices al tener ya un paquete hecho y corriendo. *¡No tan rápido!* Una de las inconveniencias de trabajar con paquetes es tener que hacer explícita la dependencia de otros paquetes. Es muy fácil incurrir en malas prácticas de programación.
+
+
+#### Ejemplo: incluyendo %>% en nuestra paquetería
+
+Supongamos que queremos incluir el operador de pipa `%>%` del paquete `magrittr` y usarlo en nuestras funciones.
+
+Los primero que tenemos que hacer es asegurarnos que al instalar nuestra paquetería se instale `magrittr`. Para eso tenemos que modificar el archivo DESCRIPTION e incluirlo en la lista de `Imports`:
+
+```yaml
+Package: metodosMultivariados2017
+Title: Paquete del Curso Metodos Multivariados 2017 - ITAM
+Version: 0.1
+Authors@R: person("Mauricio", "Garcia", email = "mauriciogtec@gmail.com", role = c("aut", "cre"))
+Description: Este paquete contiene el codigo generado en clase y los datasets oficiales. Se utiliza como metodo de distribucion de materiales del curso y tambien para ejemplificar la construccion de paquetes de R y su documentacion usando roxygen2 a traves de devtools.
+Depends: R (>= 3.3.2)
+Imports: magrittr
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+```
+
+Teóricamente, ya podemos usar la función, pero cualquier función de  `magrittr`, sin embargo tendríamos que llamarlas de la forma `magrittr::function`. Esto es lo que se **recomienda** hacer la mayoría de las veces. No obstante, en el caso particular del operador pipa, nos conviene poder usarlo in tener que escribir tanto. Para esto necesitamos un *tag* más `@import magrittr`. **No** debemos usar `library` o `require` en ninguna parte de nuestro código, lo recomendado es usar `@import`.
+
+Por ejemplo, la siguiente es una implementación de multiplicar por 4 que usa `timesTwo` y ``%>%`:
+
+```{r, eval = FALSE}
+#' @import magrittr
+#' @title Multiplicar por cuatro
+#' @description Esta es una funcion de ejemplo para multiplicar un valor o vector x por cuatro.
+#' @param x un elemento o vector numerico
+#' @details Esta funcion es parte del tutorial para hacer paquetes del curso de Metodos Multivariados 2017
+#' en el ITAM. La funcion recibe un elemento x que puede ser un numero o un vector numerico y lo devuelve
+#' multiplicado por cuatro. La documentacion de ayuda es generada usando roxygen2. La implementacion utiliza \code{\link{timesTwo}}
+#' @examples
+#' timesFour(3)
+#' timesFour(0:10)
+#' @export
+timesFour <- function(x) {
+  x %>% timesTwo() %>% timesTwo()
+}
+
+```
+
+
+Ahora podemos correr nuevamente la construcción del paquete
+
+```{r, eval = FALSE}
+devtools::document()
+devtools::install()
+```
+
+Y probar la función
+
+```{r}
+example(timesFour)
+```
+
+Podemos ver que el archivo NAMESPACE sufrió nuevamente cambios automáticos, podemos empezar a ver lo tedioso que sería manejarlo si no tuvieramos `roxygen2`.
+
+```{r, eval = FALSE}
+# Generated by roxygen2: do not edit by hand
+
+export(timesFour)
+export(timesTwo)
+import(magrittr)
+```
+
+## 5. Finalmente: utilizando Github para distribuir el paquete
+
+Mientras el paquete esté en proceso de desarrollo no podrá subirse al CRAN. Pero eso no significa que no pueda distribuirse. Para esto puden usar Github. Voy a suponer que ya están algo familiarizados, si no pueden empezar por [aquí](https://guides.github.com/).
+
+Tenemos que crear un repositorio de Github, el mío está en la siguiente dirección: [https://github.com/mauriciogtec/metodosMultivariados2017.git](https://github.com/mauriciogtec/metodosMultivariados2017.git).
+
+Para instalarlo en cualquier máquina con R, solo tenemos que correr un comando de la forma `devtools::install_github("usuario_github/nombre_repositorio")`, en mi caso:
+
+```{r, eval = FALSE}
+devtools::install_github("mauriciogtec/metodosMultivariados2017")
+```
+
+Con esto ya podemos comenzar a usar nuestro paquete desde cualquier máquina.

@@ -1,0 +1,112 @@
+---
+title: "PCA con FactorMineR"
+author: "Isabel, Raúl, Ollin y Camilo"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FactorMineR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo=FALSE,warning=FALSE,error=FALSE,include=FALSE}
+#install.packages('tidyverse')
+#install.packages("factoextra")
+library("factoextra")
+library(FactoMineR)
+library(Rcmdr)
+library(tidyverse)
+library(knitr)
+```
+
+
+![](./FactoMineR_extras/logo_intro.png) 
+
+### I. PCA: Análisis de Componentes Principales
+
+El PCA es un método para reducir dimensiones de un conjunto de datos.
+
+Técnicamente, el PCA busca la proyección según la cual los datos queden mejor representados en términos de mínimos cuadrados. Esta convierte un conjunto de observaciones de variables posiblemente correlacionadas en un conjunto de valores de variables sin correlación lineal llamadas componentes principales.[2]
+
+*Ejemplo de visualización 3-D*  
+
+http://setosa.io/ev/principal-component-analysis/
+
+### II. Métricas Relevantes
+
+- Eigenvalores
+- Eigenvectroes
+- Matriz de Covarianza
+- $Cos^2(x_k,x_{l})$
+
+![](./FactoMineR_extras/graham2.png)
+
+### III. FactoMineR: Package
+
+*Descripción:* FactoMineR es un paquete de R dedicado a análisis exploratorio de datos multivariado. 
+Desarrollado y mantenido por F. Husson entre otros.
+<img src="./FactoMineR_extras/R_PCA_1.png" width="800px" height="400px" />
+
+*Página:* http://factominer.free.fr/
+
+Realiza varios métdos clásicos como:
+
+  * Principal Components Analysis (PCA) 
+  * Correspondence analysis (CA)
+  * Multiple Correspondence Analysis (MCA) 
+  * Otros Métodos Avanzados
+  * Información/Variables suplementarias 
+
+
+### Ejemplo: Ranking de Universidades
+
+- Se eliminaron las columnas: país y rank nacional
+- Se conservó la data para 2015 sin columnas de *rank nacional* y *país*
+- Individuos son universidades
+
+
+#### Columnas Seleccionadas
+```{r echo=FALSE}
+data_orig<-read.csv("./FactoMineR_extras/cwurData.csv")
+data15 <- data_orig[data_orig$year==2015,]
+data<-data15[c(-2,-3,-4,-14)] #  ¬[institution,country,rank_nac,year]
+kable(x=names(data),row.names=T,format = "html")
+```
+
+```{r echo=F, fig.width=8, fig.height=4}
+#row.names(data)=data$institution
+
+PeCA<-PCA(data, scale.unit=T,graph=F,quanti.sup=c(1,10))
+par(mfrow=c(1,2))
+plot.PCA(PeCA, choix="var", axes = c(1,2))
+plot.PCA(PeCA, choix="var", axes = c(3,5))
+```
+
+
+```{r  fig.width=8, fig.height=4}
+par(mfrow=c(1,2))
+plot.PCA(PeCA, choix="ind",label = "none",axes = c(1,2))
+plot.PCA(PeCA, choix="ind",label = "none",axes = c(3,5))
+```
+
+
+```{r}
+summary(PeCA)
+```
+
+
+```{r  fig.width=8, fig.height=4}
+library("factoextra")
+res.pca <- prcomp(data,  scale = TRUE)
+#get_eig(res.pca)
+  par(mfrow=c(1,2))
+  fviz_eig(res.pca, addlabels=TRUE, hjust = -0.3) +
+    ylim(0, 80)
+  fviz_eig(res.pca, choice = "eigenvalue", 
+                 addlabels = TRUE)
+```
+
+##### Fuentes
+
+-https://es.wikipedia.org/wiki/An%C3%A1lisis_de_componentes_principales
+- http://factominer.free.fr/
