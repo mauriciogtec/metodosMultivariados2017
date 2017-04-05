@@ -149,9 +149,7 @@ de cada variable.
 ###Librerias utilizadas 
 ```{r, message=FALSE}
 # Cargamos paquetes
-require(FactoMineR) 
-require(ggplot2)
-
+library(metodosMultivariados2017)
 library("FactoMineR")
 library("factoextra")
 library("gplots")

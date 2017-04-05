@@ -8,20 +8,16 @@ help("senado_votacion")
 help("senado_partidos")
 
 votos <- senado_votacion[ ,-(1:3)]
-agreement <- matrix(0, nrow = ncol(votos), ncol = ncol(votos))
+disagreement <- matrix(0, nrow = ncol(votos), ncol = ncol(votos))
 for (i in 1:(ncol(votos)-1)) {
   for (j in (i+1):ncol(votos)) {
-<<<<<<< HEAD
-    agreement[i, j] <- sum(votos[ ,i] == votos[ ,j], na.rm = TRUE) / ncol(votos)
-=======
-    agreement[i, j] <- sum(na.omit(votos[ ,i] == votos[ ,j])) / length(!is.na(votos[ ,i] == votos[ ,j]))
->>>>>>> origin/master
-    agreement[j, i] <-  agreement[i, j]
+    disagreement[i, j] <- 1 - sum(votos[ ,i] == votos[ ,j], na.rm = TRUE) / ncol(votos)
+    disagreement[j, i] <-  disagreement[i, j]
   }
 }
-diag(agreement) <-  1
 
-dist_sq <- (1-agreement)^2
+dist_sq <-
+
 for (i in 1:nrow(dist_sq)) {
   dist_sq[i, ] <-   dist_sq[i, ] - mean(dist_sq[i, ])
 }

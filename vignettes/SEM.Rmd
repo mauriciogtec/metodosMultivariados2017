@@ -4,7 +4,7 @@ author: "Equipo 3"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteIndexEntry{SEM}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -191,7 +191,7 @@ Un vez que se tiene el modelo y la matriz de covarianza se usa la funcion `sem::
 
 ```{r}
 # 3. libreria SEM
-cat(file = "../vignettes/SEM/sem_intellect.txt",
+cat(file = "SEM/sem_intellect.txt",
 "humor -> simpsons, NA, 1
 humor -> familyguy, l2, NA
 humor -> amerdad, l3, NA
@@ -210,7 +210,7 @@ analytic <-> analytic, d4, NA
 intell <-> intell, NA, 1
 humor <-> humor, z1, NA")
 
-specify.sem <- sem::specifyModel(file = "sem_intellect.txt")
+specify.sem <- sem::specifyModel(file = "SEM/sem_intellect.txt")
 fit.sem <- sem::sem(specify.sem, data.cov, N = 100)
 summary(fit.sem)
 ```

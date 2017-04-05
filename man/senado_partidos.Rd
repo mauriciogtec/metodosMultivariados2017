@@ -19,3 +19,4 @@ data(senado_partidos)
 Datos de votaciones de la 63 legislatura de Mexico, primer agno, primer periodo ordinario.
 }
 \keyword{datasets}
+

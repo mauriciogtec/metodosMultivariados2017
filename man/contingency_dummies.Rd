@@ -17,3 +17,4 @@ the dummy of dummy column categories observations
 Returns two matrices, one representing dummy observations
 of rows and one representing dummy observations of colummns
 }
+

@@ -207,7 +207,7 @@ Para determinar que variables contribuyen a cada una de las componentes principa
 * **Componente 5**: Correlación positiva claridad y negativa a color --> Irridescencia de la piedra
 
 ```{r include = TRUE}
-faPC$scores <- factor.scores(ordNum,faPC)   
+faPC$scores <- psych::factor.scores(ordNum,faPC)   
 biplot.psych(faPC,choose=c(1,2),main = "Componente 1 vs Componente 2")
 biplot.psych(faPC,choose=c(1,3),main = "Componente 1 vs Componente 3")
 biplot.psych(faPC,choose=c(2,3),main = "Componente 2 vs Componente 3")
