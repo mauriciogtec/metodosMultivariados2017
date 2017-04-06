@@ -21,7 +21,7 @@ Suggests:
     Rcmdr (>= 2.3-1),
     ltm (>= 1.0-0),
     mirt (>= 1.20.1),
-    ggrepel (>=0.6.5),
+    ggrepel (>= 0.6.5),
     psych (>= 1.7.3),
     qgraph (>= 1.4.3),
     semPlot (>= 1.1),
