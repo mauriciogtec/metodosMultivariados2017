@@ -37,6 +37,9 @@ El trabajo en equipo será muy importante en este curso. Es importante que defin
 
 Para elegir su grupo, dense de alta en el siguiente [link](https://docs.google.com/spreadsheets/d/1KzvMqAbdNL7UYAn8ZFPj1BReXLmg773BDPVRAG0ivrA/edit?usp=sharing)
 
+!!! **Autoevaluación tareas grupales**
+[link](https://docs.google.com/spreadsheets/d/1AMJilzkoFArcN8PbWPfvvNSQy1owxNfIMOBhsfAyNxw/edit?usp=sharing)
+
 ## Forma de evaluación 
 
 La evaluación tentativa será de la siguiente forma:
