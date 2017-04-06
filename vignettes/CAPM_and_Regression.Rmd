@@ -1,0 +1,202 @@
+---
+title: "CAPM and Regression"
+author: "Michelle Audirac"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CAPM_and_Regression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+Assuming $X_i$ and $X_j$ have mean 0 we can compute the empirical Covariance between $X_i$ and $X_j$ using $\mathrm{\hat{Cov}}(X_i, X_j)=\big(\frac{1}{n}\big)X_i^TX_j$. Let's denote with $\hat\Sigma$ the empirical Covariance Matrix of all the $X_i$'s. It follows that
+
+\begin{equation}
+\hat\Sigma
+
+= \Big(\frac{1}{n}\Big) X^TX 
+
+= \Big(\frac{1}{n}\Big) \begin{pmatrix}
+X_1^TX_1 & X_1^TX_2 & \ldots &X_1^TX_p \\
+\vdots & \vdots & \ddots & \vdots \\
+X_p^TX_1 & X_p^TX_2 & \ldots &X_p^TX_n
+\end{pmatrix}
+
+\end{equation} 
+
+Using this simple fact, it is possible to rewrite $\hat\beta$ using only statistical terms. 
+\begin{equation}
+\hat\beta=(X^TX)^{-1}X^TY
+
+= \frac{1}{n}\hat\Sigma^{-1} X^TY
+
+= \frac{1}{n}\hat\Sigma^{-1} \begin{pmatrix}
+X_1^TY\\
+X_2^TY\\
+\vdots\\
+X_p^TY
+\end{pmatrix}
+
+= \hat\Sigma^{-1} \begin{pmatrix}
+\mathrm{\hat{Cov}}(X_1, Y)\\
+\mathrm{\hat{Cov}}(X_2, Y)\\
+\vdots\\
+\mathrm{\hat{Cov}}(X_p, Y)\\
+\end{pmatrix}
+
+= \hat\Sigma^{-1}\mathrm{\hat{Cov}}(X, Y)
+
+\end{equation}
+
+As we can see, each $\hat\beta_i$ is a linear combination of the empirical Covariances between the $X_i$'s and $Y$, weighted by elements of $\hat\Sigma^{-1}$.
+
+The beauty of the relationship between $\hat\beta$ and $\hat\Sigma^{-1}$ builds upon the properties of $\hat\Sigma^{-1}$. While the Covariance or Dispersion Matrix is pretty acclaimed, its fraternal inverse, the Precision or Concetration Matrix, is not as well known.
+
+Clearly, the diagonal elements of $\hat\Sigma$ measure how the $X_i$'s disperse around their mean and the off-diagonal elements reflect how the $X_i$'s co-vary linearly with each other. Similarly, $\hat\Sigma^{-1}$'s diagonal elements measure how the $X_i$'s concentrate around their mean. On the other hand, it is not exactly true that the off-diagonal elements of $\Sigma^{-1}$ reflect the extent to which the the $X_i's$ do not co-vary with each other. 
+
+Let's think of what would happen if we added or deleted $X_i$'s from our observation universe. If we take out an $X_i$ from our observation set, $\hat\Sigma$ is exactly the same as it was except that the $i$th column and row are dropped. In contrast, all the elements of $\hat\Sigma^{-1}$ change when an $X_i$ is added or deleted from the observation set. This is because $\hat\Sigma^{-1}$ behaves truly in a multivariate fashion rather than in a bivariate fashion, as does $\hat\Sigma$ itself. 
+
+Let's continue finding out how $\hat\beta$ relates with Precision Matrix. First we will assume that the $X_i$'s are not correlated, that is, that $\hat\Sigma$ is a diagonal matrix. In this particular case, it is straight forward that $\hat\Sigma^{-1}$ is also a diagonal matrix whose diagonal elements are the empirical precision of the $X_i$'s. Therefore, it is easy to see that when there is no correlation between the $X_i$'s, each $\hat\beta_i$ is exactly **the Covariance between $X_i$ and $Y$ weighted by the precision of $X_i$**.
+
+We will arrive to very similar conclusions for the case where $X_i$'s do co-vary with each other. To do this, we will use the eigendecomposition of $\hat\Sigma$. 
+
+Provided $PDP^T$, the eigendecomposition of $\hat\Sigma$, we know that $P$'s colums are the eigenvectors (loadings?) $P_1, P_2,\ldots, P_p$ of $\hat\Sigma$ and that the diagonal of $D$ has the eigenvalues of $\hat\Sigma$. We also know that the columns of $XP$ are a set of transformed observations $XP_1, XP_2,\ldots, XP_p$ called principal components. Since
+\begin{equation}
+\mathrm{PDP^T}=\hat\Sigma=\frac{1}{n}X^TX
+\end{equation}
+then
+\begin{equation}
+D=\frac{1}{n}P^TX^TXP=\frac{1}{n}(XP)^TXP
+\end{equation}
+so that the empirical covariance matrix of the principal components is precisely $D$. In consequence, the principal components are uncorrelated and their variances are the eigenvalues of $\hat\Sigma$.
+
+It follows that $\hat\Sigma^{-1}$ is given by $PD^{-1}P^T$, therefore 
+
+\begin{align}
+\hat\beta &= \hat\Sigma^{-1}\mathrm{\hat{Cov}}(X, Y) \\
+&= PD^{-1}P^T\mathrm{\hat{Cov}}(X, Y) \\
+&= PD^{-1}\mathrm{\hat{Cov}}(XP, Y) \\
+\end{align}
+
+If we transform $\hat\beta$ using $P^T\hat\beta$ then 
+\begin{equation}
+\mathrm{P}^T\beta = \mathrm{D^{-1}}\mathrm{\hat{Cov}}(XP, Y)
+\end{equation}
+
+In consequence, it is very nice to see that each transformed $\hat\beta_i$, given by $P_i^T\hat\beta$, is exactly **the Covariance between the $i$th principal component and Y weighted by the precision of the $i$th principal component**.
+
+
+## Example
+
+Load required packages
+```{r, warning = FALSE, message = FALSE}
+library(RCurl)
+library(lubridate)
+library(xts)
+library(dplyr)
+library(tidyr)
+library(plotly)
+```
+
+Load functions
+```{r}
+script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_prices.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_decay.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/utils.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_returns.R", ssl.verifypeer = FALSE)
+eval(parse(text = script))
+
+remove("script")
+```
+
+Fetch prices from yahoo.finance.com
+```{r}
+yahoo_id <- c(
+  "SPY",
+  "IYK", #Consumer Goods
+  "IYC", #Consumer Services
+  "IYE", #Energy
+  "IYF", #Financials
+  "IYJ", #Industrials
+  "IYM", #Materials
+  "IDU", #Utilities
+  "IYH", #Health Care
+  "IYW", #Technology
+  "IYZ", #Telecomm
+  "IYR" #Real State
+)
+
+price <- get_prices_yahoo(yahoo_id, "2010-01-01")
+
+```
+
+Get returns (daily price changes)
+```{r, fig.width = 7}
+returns <- get_returns_rollapply(price)
+
+plot_returns(returns["2016/", 1:5])
+
+cum_return <- get_returns_rollapply(price["2016/", ], is_cumulative = TRUE)
+```
+
+```{r, fig.width = 7}
+plot_returns(cum_return[, 1:5])
+```
+
+Provide a linear model of two sectors and another one with all sectors 
+```{r}
+model = lm(SPY ~ -1 + IYK + IYC, data = returns)
+model$coefficients
+
+model = lm(SPY ~ -1 + IYK + IYC + IYE + IYF + IYJ + IYM + IDU + IYH + IYW + IYZ + IYR, data = returns)
+model$coefficients
+
+beta <- model$coefficients
+```
+
+Get loadings (eigenvectors) and eigenvalues
+```{r, fig.width = 7}
+X <- returns[, -1]
+Y <- returns[, 1]
+
+cov_X <- cov(X, use = "pairwise.complete.obs")
+P <- eigen(cov_X)$vectors
+colnames(P) <- yahoo_id[-1]
+d <- eigen(cov_X)$values
+
+pp <- X %*% P
+pp <- as.xts(pp, order.by = index(returns))
+
+plot_returns(pp["2016/", 1:5])
+```
+
+
+Provide a linear model of two principal components and another one with all of them
+```{r}
+pp_returns <- data.frame(returns$SPY, pp)
+
+model = lm(SPY ~ -1 + IYK + IYC, data = pp_returns)
+model$coefficients
+
+model = lm(SPY ~ -1 + IYK + IYC + IYE + IYF + IYJ + IYM + IDU + IYH + IYW + IYZ + IYR, data = pp_returns)
+model$coefficients
+```
+
+Prove result
+```{r}
+cov_ppY <- cov(pp_returns, Y, use = "pairwise.complete.obs")
+
+cov_ppY/d
+
+```
+
+Show that the first principal component is the market
+```{r}
+cor(pp[, 1], Y, use = "pairwise.complete.obs")
+```
