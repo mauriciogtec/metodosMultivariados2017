@@ -6,6 +6,8 @@
   + Deben mandármelo por correo antes de la clase del 19 de abril.
   + Un envío por equipo, incluir en el correo las claves de los integrantes. Enviar a mauricio.garcia@itam.mx
   + También se deben evaluar a su propio equipo. Indicar en el correo quién en su equipo.
+  + !!! **Autoevaluación tareas grupales** [link](https://docs.google.com/spreadsheets/d/1AMJilzkoFArcN8PbWPfvvNSQy1owxNfIMOBhsfAyNxw/edit?usp=sharing)
+
 
 * Las clases 8, 15 y 22 de marzo serán de 6:00pm a 9:30pm para reponer horas de clase perdidas.
 * La fecha tentativa para un examen parcial será el 29 de marzo
@@ -44,10 +46,6 @@ El trabajo en equipo será muy importante en este curso. Es importante que defin
 
 Para elegir su grupo, dense de alta en el siguiente [link](https://docs.google.com/spreadsheets/d/1KzvMqAbdNL7UYAn8ZFPj1BReXLmg773BDPVRAG0ivrA/edit?usp=sharing)
 
-!!! **Autoevaluación tareas grupales**
-
-
-[link](https://docs.google.com/spreadsheets/d/1AMJilzkoFArcN8PbWPfvvNSQy1owxNfIMOBhsfAyNxw/edit?usp=sharing)
 
 ## Forma de evaluación 
 
