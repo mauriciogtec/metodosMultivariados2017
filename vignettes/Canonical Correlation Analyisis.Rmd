@@ -1,0 +1,240 @@
+---
+title: "Análisis de correlaciones canónicas"
+author: "Oscar Daniel Camarena, Maximiliano Alvarez, Patricio Hernández, Alejandro Pérez"
+date: "29 de marzo de 2017"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Canonical Correlation Analyisis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Análisis de correlaciones canónicas
+
+```{r echo=FALSE, include=FALSE}
+require("candisc")
+```
+
+### Introducción
+
+El análisis de componentes principales analiza la  interrelación entre un conjunto de variables. Sin embargo, hay situaciones en las necesitemos estudiar la *relación entre dos conjuntos de variables*. 
+
+Por ejemplo, en psicología, un investigador puede estar interesado en medir, por un lado, un conjunto de variables que representen aptitudes y, por otro, un conjunto de variables que cuantifiquen metas o desemepños  académicos para una muestra de estudiantes, con la finalidad de sacar conclusiones entre "aptitudes" y "desempeños".
+
+Una técnica que puede facilitar este tipo de análisis es el *análisis de correlaciones canónicas*, **CCA**.
+
+A pesar del tipo de resultados que este método arroja, no es muy usado debido a que la interpretabilidad de los mismos es pequeña.
+
+### Motivación
+
+En una regresión múltiple, contamos con una *variable de respuesta*, la cual  está en teoría "correlacionada" con un conjunto de *variables explicativas*; el éxito en la predictibilidad de ésta se basa en encontrar una combinación de  estimadores para dichas  *variables explicativas* que reflejen de manera efetiva las supuestas correlaciones que tienen éstas con la *variable de respuesta*.
+
+Cuando **NO** tenemos una *variable de respuesta*, sino un **conjunto** de ellas, y tratamos de distinguir *a priori* las combinaciones lineales de *variables explicativas* que maximizan la correlación entre éstas y las *variables de respuesta* podemos enfrentarnos a un verdadero problema. En este tipo de situaciones donde lo que buscamos es **distinguir** aquellas variables a incluir en nuestro *modelo*, cualquiera que este sea, recurrimos al **CCA**. El proceso de extracción de los coeficientes que definen estas combinaciones lineales es similar al proceso del **PCA**, lo cual no es de extrañar.
+
+### Propósito
+
+El propósito de **CCA** es *describir la relación estadística que existe entre dos conjuntos de variables* $X^T=(x_1,x_2,...,x_n)$ y $Y^T=(y_1,y_2,...,y_m)$. 
+
+La matriz de correlaciones, de dimensión $(n + m)$ x $(m + n)$, contiene toda la información de las asociaciones entre los pares de variables de los dos conjuntos. Sin embargo, el proceso de extracción e interpretación de la  información referente a la asociación entre los dos conjuntos de variables como ya mencionamos, no es una tarea sencilla ni intuitiva. Esto se debe a que las correlaciones entre los dos conjuntos pueden no presentar un patrón visible a simple vista o bien consistente.
+
+### Pregunta y proceso de respuesta
+
+*¿Cómo cuantificamos la asociación entre dos conjuntos de variables $X$ y $Y$?* 
+
+El método que adopta **CCA** es tomar la medida de asociación entre  $X$ y $Y$  cuya correlación sea la más grande entre dos variables, $u_1$ y $v_1$, derivadas de $X$ y $Y$, donde $u_1$ es una combinacion lineal de $x_1,x_2,...,x_n$ y $v_1$ una combinación lineal de $y_1,y_2,...,y_m$. 
+
+El problema es que muchas veces un par de variables $(u_1,v_1)$ no siempre es suficiente para cuantificar la asociación entre las variables $X$ y $Y$. Por ello, es necesario que consideremos algunos o todos los $s$ pares $(u_1,v_1),(u_2,v_2),...,(u_s,v_s)$, donde $s = min(m,n)$. 
+
+Todas las variables $u_i$ son una combinación lineal de las variables en $X$, $u_i =a_i^T x$, y todas las variables $v_i$ son combinaciones lineales de las variables en$Y$, $v_i = b_i^T y$, con coeficientes $(a_i,b_i)(i = 1...s)$ derivados de tal forma que $u_i$ y $v_i$ cumplan con lo siguiente:
+
+**1.** Las variables $u_i$ no estan correlacionadas, es decir, $Cov(u_i,u_j) = 0$ para $i \ne j$.
+
+**2.** Las variables $v_i$ no estan correlacionadas, es decir, $Cov(v_i,v_j) = 0$ para $i \ne j$.
+
+**3.** La correlación entre $u_i$ y $v_i$ es $R_i$ para $i = 1...s$, donde $R_i > R_2 >...>R_s$ Las $R_i$ son las *correlaciones canónicas*.
+
+**4.** Las variables $u_i$ no están correlacionadas con las variables $v_j$ con excepción de las variables $v_i$, es decir, $Cov(u_i,v_j) = 0$ para $i \ne j$.
+
+Los vectores $a_i$ y $b_i$, $i = 1,...,s$ que definen la combinaciónes lineales de las variables $X$ y $Y$ son encontrados como las matrices de eigenvectores $E_1(n$x$n)$ ($a_i$) y $E_2(m$x$m)$ ($b_i$), definidas como:
+
+$$E_1 = R^{-1}_{11} R_{12} R^{-1}_{22} R_{21}$$
+
+$$E_2 = R^{-1}_{22} R_{21} R^{-1}_{11} R_{12}$$
+
+donde $R_{11}$ es la matriz de correlaciones de $X$, $R_{22}$ es la matriz de correlaciones de $Y$, y $R_{12} = R_{21}$ es la matriz de correlaciones $n$ x $m$ de los dos conjuntos de variables. 
+
+Las correlaciones canonicas $R_1, R_2, ..., R_s$ se obtienen como las raíces cuadradas de los eigenvalores distintos a **0** de $E_1$ o $E_2$. Las *s* correlaciones canónicas  $R_1, R_2, ..., R_s$ expresan la asociación entre las variables $X$ y $Y$ después de remover las correlaciones dentro de las variables del mismo set.
+
+### Ejemplo 1 Artesanal
+
+Para este ejemplo, usaremos el data set de *Iris*. Consideraremos todo el data set (incluyendo las tres especies)
+
+```{r echo=FALSE}
+attach(iris)
+```
+
+Primero, estandarizamos las variables dividiendo entre la desviación estándar de cada variable, (removemos la columna 5 que son etiquetas)
+
+```{r}
+iris.std <- sweep(iris[,-5], 2, sqrt(apply(iris[,-5],2,var)), FUN="/")
+sepal.meas <- iris.std[,1:2]
+petal.meas <- iris.std[,3:4]
+```
+
+Hacemos **CCA** de manera *artesanal*
+
+Para esto, primero encontramos las matrices de correlaciones
+
+```{r}
+R11 <- cor(sepal.meas)
+R22 <- cor(petal.meas)
+R12 <- c(cor(sepal.meas[,1], petal.meas[,1]), cor(sepal.meas[,1], petal.meas[,2]),
+         cor(sepal.meas[,2], petal.meas[,1]), cor(sepal.meas[,2], petal.meas[,2]))
+R12 <- matrix(R12, ncol=ncol(R22), byrow=T) # R12 has q2 columns, same as number of petal measurements
+R21 <- t(R12)  # R21=transpose of R12
+
+```
+
+Encontramos las matrices $E_1$ y $E_2$
+
+```{r}
+E1 <- solve(R11) %*% R12 %*% solve(R22) %*% R21
+E2 <- solve(R22) %*% R21 %*% solve(R11) %*% R12
+print("E1")
+print("E2")
+```
+
+Encontramos eigenvectores y eigenvalores de $E_1$, $E_2$
+
+```{r}
+eigen(E1)
+eigen(E2)
+```
+
+Las correlaciones canónicas son:
+
+```{r}
+canon.corr <- sqrt(eigen(E1)$values)
+canon.corr
+```
+
+Las variables canónicas están basadas en los eigenvecotres de $E_1$ y $E_2$
+
+```{r}
+a1=eigen(E1)$vectors[,1]
+b1=eigen(E2)$vectors[,1]
+a2=eigen(E1)$vectors[,2]
+b2=eigen(E2)$vectors[,2]
+```
+
+```{r}
+a1
+b1
+a2
+b2
+```
+
+La primer correlación canónica es significativa como lo podemos verificar en la prueba de Wilks más adelante
+
+```{r}
+u1 = a1[1]*Sepal.Length + a1[2]*Sepal.Width
+v1 = b1[1]*Sepal.Length + b1[2]*Sepal.Width
+```
+
+```{r}
+u1
+v1
+``` 
+
+Graficamos el primer conjunto de variables canónicas
+
+```{r echo=FALSE}
+u1 <- as.matrix(iris.std[,1:2]) %*% as.matrix(eigen(E1)$vectors[,1])
+v1 <- as.matrix(iris.std[,3:4]) %*% as.matrix(eigen(E2)$vectors[,1])
+plot(u1,v1)
+```
+
+Graficamos el segundo conjunto de variables canónicas
+
+```{r echo=FALSE}
+u2 <- as.matrix(iris.std[,1:2]) %*% as.matrix(eigen(E1)$vectors[,2])
+v2 <- as.matrix(iris.std[,3:4]) %*% as.matrix(eigen(E2)$vectors[,2])
+plot(u2,v2)
+```
+
+```{r echo=FALSE}
+#cc <- cancor(sepal.meas, petal.meas, set.names = c("Sepal","Petal"))
+#Wilks(cc)
+```
+
+### Ejemplo 2 (datos reales)
+
+Una vez analizado el proceso, podemos hacer uso de las distintas librerías disponibles en R, para este ejemplo utilizamos las librerías *candisc, ggplot2, GGally y CCA*.
+```{r echo=FALSE, include=FALSE}
+require("ggplot2")
+require("GGally")
+require("CCA")
+require("candisc")
+```
+
+Cargamos los datos de una base real y los estandarizamos al igual que en el ejemplo pasado
+```{r}
+datos <- read.csv("CCAData/DATABASE.csv")
+datos$Money <- as.numeric(datos$Money)
+datos <- sweep(datos, 2, sqrt(apply(datos,2,var)), FUN="/")
+
+levels <- datos[1:3]
+cont <- datos[4:6]
+```
+
+Podemos realizar un primer análisis exploratorio de los datos
+```{r echo=FALSE}
+ggpairs(levels)
+ggpairs(cont)
+```
+
+Observamos la matriz de correlaciones de ambos conjuntos de datos
+```{r}
+CCA::matcor(levels, cont)
+```
+
+Ahora, podemos analizar las correlaciones canónicas y mostramos los coeficientes canónicos *raw*
+```{r}
+cc1 <- candisc::cancor(levels,cont, set.names = c("Behavioural","Financial"))
+cc2 <- CCA::cc(levels,cont)
+
+zapsmall(cor(candisc::scores(cc1, type="x"), candisc::scores(cc1, type="y")))
+
+coef(cc1, type="both")
+```
+
+Los coeficientes anteriores se pueden entender de una manera similar a como usualmente interpretamos los coeficientes de regresión, ya que por ejemplo para la variable *Money*, un aumento en una unidad representa una disminución de *0.06751989* en la primera variable canónica del set 2, asumiendo que las demás variables se mantienen constantes.
+
+También podemos obtener los loadings canónicos para el análisis, estos loadings son las correlaciones entre las variables y las variables canónicas.
+```{r}
+cc3 <- comput(levels, cont, cc2)
+
+cc3[3:6]
+```
+En general, el número de dimensiones canónicas es igual al número de variables en el conjunto más pequeño; sin embargo en la realidad este número puede ser aún menor. Las variables canónicas son el simil de los factores que se obtienen al realizar un *factor analysis*.
+
+En este ejemplo en particular tenemos 3 dimensiones canónicas de las cuales 2 son estadísticamente significativas a un nivel de significancia del 5% como lo podemos apreciar en la prueba de Wilks.
+
+```{r}
+Wilks(cc1)
+```
+Como la prueba misma lo indica, el primer test prueba la significancia de las 3 dimensiones en conjunto, el segundo prueba la significancia de las dimensiones 2 y 3 en conjunto y finalmente el útlimo prueba la significancia de la dimensión 3 sóla.
+
+De lo anterior podemos concluir que las dimensiones 1 y 2 son relevantes mientras que la 3 no lo es.
+
+Cuando las variables en el modelo tienen desviaciones estandar muy distintas, los coeficientes estandarizados permiten realizar comparaciones entre las variables de manera más sencilla.
+
+```{r}
+coef(cc1, type="both", standardize=TRUE)
+```
+
+Los coeficientes anteriores se interpretan de manera similar a los coeficientes *raw* con una diferencia en las unidades, por ejemplo, para la variable *Money*, un aumento de una desviación estandar implica una disminución de *.06751989* en la desviación estandar de la primera variable canónica para el set 2, siempre y cuando las demás variables se mantengan constantes.
