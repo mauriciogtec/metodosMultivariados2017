@@ -1,6 +1,8 @@
 
 ### ¡¡¡ANUNCIOS!!! ### 
 
+* Hoy a las 11:59pm es el deadline para subir sus viñetas para autoevaluación. Extenderé el deadline hasta mañana a las 11:59am, momento en que comenzaré a compilar la paquetaría y viñetas. Una vez compiladas y cargadas las viñetas, quienes no hayan subidos sus viñetas no contarán para la autoevaluación (aún me faltan las viñetas de Análisis Factorial Mixto y Correlaciones Canónicas). Recuerden que las viñetas pueden consultarse en [link](https://github.com/mauriciogtec/metodosMultivariados2017/tree/master/inst/doc) o usando `browseVignettes(metodosMultivariados2017)` tras instalar la paquetería.
+* Ya están listas las preguntas de control de examen dentro de la carpeta de materiales de clase en [este link](https://github.com/mauriciogtec/metodosMultivariados2017/blob/master/materiales_clase/MM2017PreguntasControl1.pdf). La fecha límite de entrega es la clase del 19 de abril (al inicio de la clase). Se entrega una sola lista de respuestas por equipo. Todo el equipo debe conocer el contenido de sus respuestas. Podrá haber controles orales el mismo 19 de abril.
 * Todos los equipos deben mandarme por correo la evaluación de los viñetas de los demás equipos.
   + Comienzo de evaluación: Sábado 8 de abril 11:59pm. Antes de fecha pueden hacer modifiaciones.
   + Deben mandármelo por correo antes de la clase del 19 de abril.
