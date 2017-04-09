@@ -4,7 +4,7 @@ author: "Oscar Daniel Camarena, Maximiliano Alvarez, Patricio Hernández, Alejan
 date: "29 de marzo de 2017"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Canonical Correlation Analyisis}
+  %\VignetteIndexEntry{CanonicalCorrelationAnalyisis}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
