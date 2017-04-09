@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Oscar Daniel Camarena, Maximiliano Alvarez, Patricio Hernández, Alejandro Pérez" />
+
+
+<title>Análisis de correlaciones canónicas</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<link href="data:text/css;charset=utf-8,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23header%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%20code%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Análisis de correlaciones canónicas</h1>
+<h4 class="author"><em>Oscar Daniel Camarena, Maximiliano Alvarez, Patricio Hernández, Alejandro Pérez</em></h4>
+<h4 class="date"><em>29 de marzo de 2017</em></h4>
+
+
+
+<div id="analisis-de-correlaciones-canonicas" class="section level2">
+<h2>Análisis de correlaciones canónicas</h2>
+<div id="introduccion" class="section level3">
+<h3>Introducción</h3>
+<p>El análisis de componentes principales analiza la interrelación entre un conjunto de variables. Sin embargo, hay situaciones en las necesitemos estudiar la <em>relación entre dos conjuntos de variables</em>.</p>
+<p>Por ejemplo, en psicología, un investigador puede estar interesado en medir, por un lado, un conjunto de variables que representen aptitudes y, por otro, un conjunto de variables que cuantifiquen metas o desemepños académicos para una muestra de estudiantes, con la finalidad de sacar conclusiones entre “aptitudes” y “desempeños”.</p>
+<p>Una técnica que puede facilitar este tipo de análisis es el <em>análisis de correlaciones canónicas</em>, <strong>CCA</strong>.</p>
+<p>A pesar del tipo de resultados que este método arroja, no es muy usado debido a que la interpretabilidad de los mismos es pequeña.</p>
+</div>
+<div id="motivacion" class="section level3">
+<h3>Motivación</h3>
+<p>En una regresión múltiple, contamos con una <em>variable de respuesta</em>, la cual está en teoría “correlacionada” con un conjunto de <em>variables explicativas</em>; el éxito en la predictibilidad de ésta se basa en encontrar una combinación de estimadores para dichas <em>variables explicativas</em> que reflejen de manera efetiva las supuestas correlaciones que tienen éstas con la <em>variable de respuesta</em>.</p>
+<p>Cuando <strong>NO</strong> tenemos una <em>variable de respuesta</em>, sino un <strong>conjunto</strong> de ellas, y tratamos de distinguir <em>a priori</em> las combinaciones lineales de <em>variables explicativas</em> que maximizan la correlación entre éstas y las <em>variables de respuesta</em> podemos enfrentarnos a un verdadero problema. En este tipo de situaciones donde lo que buscamos es <strong>distinguir</strong> aquellas variables a incluir en nuestro <em>modelo</em>, cualquiera que este sea, recurrimos al <strong>CCA</strong>. El proceso de extracción de los coeficientes que definen estas combinaciones lineales es similar al proceso del <strong>PCA</strong>, lo cual no es de extrañar.</p>
+</div>
+<div id="proposito" class="section level3">
+<h3>Propósito</h3>
+<p>El propósito de <strong>CCA</strong> es <em>describir la relación estadística que existe entre dos conjuntos de variables</em> <span class="math inline">\(X^T=(x_1,x_2,...,x_n)\)</span> y <span class="math inline">\(Y^T=(y_1,y_2,...,y_m)\)</span>.</p>
+<p>La matriz de correlaciones, de dimensión <span class="math inline">\((n + m)\)</span> x <span class="math inline">\((m + n)\)</span>, contiene toda la información de las asociaciones entre los pares de variables de los dos conjuntos. Sin embargo, el proceso de extracción e interpretación de la información referente a la asociación entre los dos conjuntos de variables como ya mencionamos, no es una tarea sencilla ni intuitiva. Esto se debe a que las correlaciones entre los dos conjuntos pueden no presentar un patrón visible a simple vista o bien consistente.</p>
+</div>
+<div id="pregunta-y-proceso-de-respuesta" class="section level3">
+<h3>Pregunta y proceso de respuesta</h3>
+<p><em>¿Cómo cuantificamos la asociación entre dos conjuntos de variables <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span>?</em></p>
+<p>El método que adopta <strong>CCA</strong> es tomar la medida de asociación entre <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span> cuya correlación sea la más grande entre dos variables, <span class="math inline">\(u_1\)</span> y <span class="math inline">\(v_1\)</span>, derivadas de <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span>, donde <span class="math inline">\(u_1\)</span> es una combinacion lineal de <span class="math inline">\(x_1,x_2,...,x_n\)</span> y <span class="math inline">\(v_1\)</span> una combinación lineal de <span class="math inline">\(y_1,y_2,...,y_m\)</span>.</p>
+<p>El problema es que muchas veces un par de variables <span class="math inline">\((u_1,v_1)\)</span> no siempre es suficiente para cuantificar la asociación entre las variables <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span>. Por ello, es necesario que consideremos algunos o todos los <span class="math inline">\(s\)</span> pares <span class="math inline">\((u_1,v_1),(u_2,v_2),...,(u_s,v_s)\)</span>, donde <span class="math inline">\(s = min(m,n)\)</span>.</p>
+<p>Todas las variables <span class="math inline">\(u_i\)</span> son una combinación lineal de las variables en <span class="math inline">\(X\)</span>, <span class="math inline">\(u_i =a_i^T x\)</span>, y todas las variables <span class="math inline">\(v_i\)</span> son combinaciones lineales de las variables en<span class="math inline">\(Y\)</span>, <span class="math inline">\(v_i = b_i^T y\)</span>, con coeficientes <span class="math inline">\((a_i,b_i)(i = 1...s)\)</span> derivados de tal forma que <span class="math inline">\(u_i\)</span> y <span class="math inline">\(v_i\)</span> cumplan con lo siguiente:</p>
+<p><strong>1.</strong> Las variables <span class="math inline">\(u_i\)</span> no estan correlacionadas, es decir, <span class="math inline">\(Cov(u_i,u_j) = 0\)</span> para <span class="math inline">\(i \ne j\)</span>.</p>
+<p><strong>2.</strong> Las variables <span class="math inline">\(v_i\)</span> no estan correlacionadas, es decir, <span class="math inline">\(Cov(v_i,v_j) = 0\)</span> para <span class="math inline">\(i \ne j\)</span>.</p>
+<p><strong>3.</strong> La correlación entre <span class="math inline">\(u_i\)</span> y <span class="math inline">\(v_i\)</span> es <span class="math inline">\(R_i\)</span> para <span class="math inline">\(i = 1...s\)</span>, donde <span class="math inline">\(R_i &gt; R_2 &gt;...&gt;R_s\)</span> Las <span class="math inline">\(R_i\)</span> son las <em>correlaciones canónicas</em>.</p>
+<p><strong>4.</strong> Las variables <span class="math inline">\(u_i\)</span> no están correlacionadas con las variables <span class="math inline">\(v_j\)</span> con excepción de las variables <span class="math inline">\(v_i\)</span>, es decir, <span class="math inline">\(Cov(u_i,v_j) = 0\)</span> para <span class="math inline">\(i \ne j\)</span>.</p>
+<p>Los vectores <span class="math inline">\(a_i\)</span> y <span class="math inline">\(b_i\)</span>, <span class="math inline">\(i = 1,...,s\)</span> que definen la combinaciónes lineales de las variables <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span> son encontrados como las matrices de eigenvectores <span class="math inline">\(E_1(n\)</span>x<span class="math inline">\(n)\)</span> (<span class="math inline">\(a_i\)</span>) y <span class="math inline">\(E_2(m\)</span>x<span class="math inline">\(m)\)</span> (<span class="math inline">\(b_i\)</span>), definidas como:</p>
+<p><span class="math display">\[E_1 = R^{-1}_{11} R_{12} R^{-1}_{22} R_{21}\]</span></p>
+<p><span class="math display">\[E_2 = R^{-1}_{22} R_{21} R^{-1}_{11} R_{12}\]</span></p>
+<p>donde <span class="math inline">\(R_{11}\)</span> es la matriz de correlaciones de <span class="math inline">\(X\)</span>, <span class="math inline">\(R_{22}\)</span> es la matriz de correlaciones de <span class="math inline">\(Y\)</span>, y <span class="math inline">\(R_{12} = R_{21}\)</span> es la matriz de correlaciones <span class="math inline">\(n\)</span> x <span class="math inline">\(m\)</span> de los dos conjuntos de variables.</p>
+<p>Las correlaciones canonicas <span class="math inline">\(R_1, R_2, ..., R_s\)</span> se obtienen como las raíces cuadradas de los eigenvalores distintos a <strong>0</strong> de <span class="math inline">\(E_1\)</span> o <span class="math inline">\(E_2\)</span>. Las <em>s</em> correlaciones canónicas <span class="math inline">\(R_1, R_2, ..., R_s\)</span> expresan la asociación entre las variables <span class="math inline">\(X\)</span> y <span class="math inline">\(Y\)</span> después de remover las correlaciones dentro de las variables del mismo set.</p>
+</div>
+<div id="ejemplo-1-artesanal" class="section level3">
+<h3>Ejemplo 1 Artesanal</h3>
+<p>Para este ejemplo, usaremos el data set de <em>Iris</em>. Consideraremos todo el data set (incluyendo las tres especies)</p>
+<p>Primero, estandarizamos las variables dividiendo entre la desviación estándar de cada variable, (removemos la columna 5 que son etiquetas)</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">iris.std &lt;-<span class="st"> </span><span class="kw">sweep</span>(iris[,-<span class="dv">5</span>], <span class="dv">2</span>, <span class="kw">sqrt</span>(<span class="kw">apply</span>(iris[,-<span class="dv">5</span>],<span class="dv">2</span>,var)), <span class="dt">FUN=</span><span class="st">&quot;/&quot;</span>)
+sepal.meas &lt;-<span class="st"> </span>iris.std[,<span class="dv">1</span>:<span class="dv">2</span>]
+petal.meas &lt;-<span class="st"> </span>iris.std[,<span class="dv">3</span>:<span class="dv">4</span>]</code></pre></div>
+<p>Hacemos <strong>CCA</strong> de manera <em>artesanal</em></p>
+<p>Para esto, primero encontramos las matrices de correlaciones</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">R11 &lt;-<span class="st"> </span><span class="kw">cor</span>(sepal.meas)
+R22 &lt;-<span class="st"> </span><span class="kw">cor</span>(petal.meas)
+R12 &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="kw">cor</span>(sepal.meas[,<span class="dv">1</span>], petal.meas[,<span class="dv">1</span>]), <span class="kw">cor</span>(sepal.meas[,<span class="dv">1</span>], petal.meas[,<span class="dv">2</span>]),
+         <span class="kw">cor</span>(sepal.meas[,<span class="dv">2</span>], petal.meas[,<span class="dv">1</span>]), <span class="kw">cor</span>(sepal.meas[,<span class="dv">2</span>], petal.meas[,<span class="dv">2</span>]))
+R12 &lt;-<span class="st"> </span><span class="kw">matrix</span>(R12, <span class="dt">ncol=</span><span class="kw">ncol</span>(R22), <span class="dt">byrow=</span>T) <span class="co"># R12 has q2 columns, same as number of petal measurements</span>
+R21 &lt;-<span class="st"> </span><span class="kw">t</span>(R12)  <span class="co"># R21=transpose of R12</span></code></pre></div>
+<p>Encontramos las matrices <span class="math inline">\(E_1\)</span> y <span class="math inline">\(E_2\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">E1 &lt;-<span class="st"> </span><span class="kw">solve</span>(R11) %*%<span class="st"> </span>R12 %*%<span class="st"> </span><span class="kw">solve</span>(R22) %*%<span class="st"> </span>R21
+E2 &lt;-<span class="st"> </span><span class="kw">solve</span>(R22) %*%<span class="st"> </span>R21 %*%<span class="st"> </span><span class="kw">solve</span>(R11) %*%<span class="st"> </span>R12
+<span class="kw">print</span>(<span class="st">&quot;E1&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;E1&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">print</span>(<span class="st">&quot;E2&quot;</span>)</code></pre></div>
+<pre><code>## [1] &quot;E2&quot;</code></pre>
+<p>Encontramos eigenvectores y eigenvalores de <span class="math inline">\(E_1\)</span>, <span class="math inline">\(E_2\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eigen</span>(E1)</code></pre></div>
+<pre><code>## $values
+## [1] 0.88542265 0.01536035
+## 
+## $vectors
+##            [,1]      [,2]
+## [1,]  0.9216534 0.4565611
+## [2,] -0.3880142 0.8896920</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">eigen</span>(E2)</code></pre></div>
+<pre><code>## $values
+## [1] 0.88542265 0.01536035
+## 
+## $vectors
+##            [,1]       [,2]
+## [1,]  0.9430302 -0.6786140
+## [2,] -0.3327071  0.7344951</code></pre>
+<p>Las correlaciones canónicas son:</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">canon.corr &lt;-<span class="st"> </span><span class="kw">sqrt</span>(<span class="kw">eigen</span>(E1)$values)
+canon.corr</code></pre></div>
+<pre><code>## [1] 0.9409690 0.1239369</code></pre>
+<p>Las variables canónicas están basadas en los eigenvecotres de <span class="math inline">\(E_1\)</span> y <span class="math inline">\(E_2\)</span></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a1=<span class="kw">eigen</span>(E1)$vectors[,<span class="dv">1</span>]
+b1=<span class="kw">eigen</span>(E2)$vectors[,<span class="dv">1</span>]
+a2=<span class="kw">eigen</span>(E1)$vectors[,<span class="dv">2</span>]
+b2=<span class="kw">eigen</span>(E2)$vectors[,<span class="dv">2</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a1</code></pre></div>
+<pre><code>## [1]  0.9216534 -0.3880142</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">b1</code></pre></div>
+<pre><code>## [1]  0.9430302 -0.3327071</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a2</code></pre></div>
+<pre><code>## [1] 0.4565611 0.8896920</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">b2</code></pre></div>
+<pre><code>## [1] -0.6786140  0.7344951</code></pre>
+<p>La primer correlación canónica es significativa como lo podemos verificar en la prueba de Wilks más adelante</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">u1 =<span class="st"> </span>a1[<span class="dv">1</span>]*Sepal.Length +<span class="st"> </span>a1[<span class="dv">2</span>]*Sepal.Width
+v1 =<span class="st"> </span>b1[<span class="dv">1</span>]*Sepal.Length +<span class="st"> </span>b1[<span class="dv">2</span>]*Sepal.Width</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">u1</code></pre></div>
+<pre><code>##   [1] 3.342383 3.352059 3.090126 3.036762 3.211416 3.463673 2.920358
+##   [8] 3.289019 2.930034 3.313258 3.541276 3.104688 3.259894 2.799067
+##  [15] 3.793533 3.546162 3.463673 3.342383 3.778971 3.225979 3.657680
+##  [22] 3.264780 2.842755 3.419986 3.104688 3.444225 3.289019 3.434548
+##  [29] 3.473350 3.090126 3.221093 3.657680 3.201740 3.439434 3.313258
+##  [36] 3.366622 3.711044 3.119251 2.891233 3.381184 3.250218 3.255008
+##  [43] 2.813630 3.250218 3.225979 3.259894 3.225979 2.997960 3.449111
+##  [50] 3.327820 5.209929 4.656937 5.156565 4.176661 4.904308 4.166985
+##  [57] 4.525970 3.584868 4.957671 3.744960 3.832239 4.273713 4.676289
+##  [64] 4.496845 4.036018 4.972234 3.997217 4.297952 4.860620 4.191224
+##  [71] 4.196110 4.535646 4.836381 4.535646 4.773341 4.918870 5.180804
+##  [78] 5.011035 4.404679 4.244588 4.137860 4.137860 4.297952 4.482282
+##  [85] 3.812886 4.210672 4.972234 4.913984 3.997217 4.099058 4.060257
+##  [92] 4.458043 4.336753 3.715835 4.113621 4.089382 4.128183 4.589010
+##  [99] 3.730397 4.166985 4.525970 4.297952 5.379697 4.681175 4.826705
+## [106] 5.840523 3.546066 5.602829 5.205042 5.239054 4.749102 4.850944
+## [113] 5.103201 4.283389 4.259150 4.656937 4.826705 5.622278 6.087894
+## [120] 4.676289 5.117763 4.074819 6.010292 4.758778 4.894631 5.394259
+## [127] 4.627812 4.458043 4.812142 5.471862 5.733796 5.806608 4.812142
+## [134] 4.719977 4.613249 5.932689 4.487168 4.695738 4.365878 5.156565
+## [141] 4.972234 5.156565 4.297952 5.025598 4.894631 5.011035 4.836381
+## [148] 4.826705 4.395003 4.273713</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">v1</code></pre></div>
+<pre><code>##   [1] 3.644979 3.622727 3.367579 3.306547 3.517406 3.794806 3.206735
+##   [8] 3.583947 3.184482 3.589456 3.861347 3.395341 3.528424 3.056909
+##  [15] 4.138747 3.911361 3.794806 3.644979 4.110985 3.545167 3.961159
+##  [22] 3.578438 3.140193 3.711521 3.395341 3.717030 3.583947 3.739282
+##  [29] 3.772553 3.367579 3.495153 3.961159 3.539658 3.789296 3.589456
+##  [36] 3.650488 4.022191 3.423103 3.151212 3.678250 3.550676 3.478410
+##  [43] 3.084670 3.550676 3.545167 3.528424 3.545167 3.273276 3.767044
+##  [50] 3.617218 5.536549 4.970731 5.475517 4.421440 5.198117 4.443692
+##  [57] 4.843157 3.822351 5.259149 4.005448 4.049737 4.565757 4.926226
+##  [64] 4.787634 4.316119 5.286910 4.282848 4.571266 5.114832 4.449201
+##  [71] 4.499216 4.820904 5.109323 4.820904 5.070543 5.225878 5.481026
+##  [78] 5.320181 4.693331 4.510234 4.388169 4.388169 4.571266 4.759872
+##  [85] 4.094242 4.526977 5.286910 5.175864 4.282848 4.354898 4.321628
+##  [92] 4.754363 4.604537 3.949925 4.382660 4.377151 4.410422 4.881937
+##  [99] 3.977686 4.443692 4.843157 4.571266 5.697393 4.976240 5.131575
+## [106] 6.168908 3.789080 5.919270 5.486535 5.592072 5.065034 5.137084
+## [113] 5.414484 4.543505 4.537995 4.970731 5.131575 5.997046 6.396294
+## [120] 4.926226 5.442246 4.349389 6.329753 5.042781 5.220369 5.725155
+## [127] 4.915207 4.754363 5.103814 5.791696 6.046844 6.185652 5.103814
+## [134] 5.009511 4.887446 6.263211 4.809886 5.004001 4.660060 5.475517
+## [141] 5.286910 5.475517 4.571266 5.347943 5.220369 5.320181 5.109323
+## [148] 5.131575 4.715583 4.565757</code></pre>
+<p>Graficamos el primer conjunto de variables canónicas</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAATlBMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6Ojo6kNtmAABmtrZmtv+QOgCQZgCQ2/+2ZgC2/7a2///bkDrb////tmb/25D//7b//9v///+tg7xNAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAJQklEQVR4nO2dDZujJhRGaXe37UybNq2bmfD//2hV5EuFFw1XSeY9Tzc7zSDq2csFIswoTbKosy+gdSgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEKCyIPU0nCWobnVViaxQ0AJl/kyaKGiOuTI1aZIR9Pn+1r/e+n+DX/+rUN2xqPhVTlD37efw1V+PV1cZkHiPEjSpGTU9WF1dEu3GaxsLyAv6+DEKuiUa2WmCwgDR3kuobXxPPAe1GkGxoFhDdFGSvdjn+zDC+q5tun6wuqoEAaPmDWntoqS6+d7RL//0HVnCTwM5KAqc4wUdXN2mU7sxjvatKJluvqCg8AKCMEp0/tKCutZ6sfgC8Gz04AjaPkmuj4obVvjeWuniah+7KuHqNp5ZTf9Us/dSxYvrrYi8oERQzOai4Xvr1RSfr/zSerr+8sxA8awclAoKtXg9Q1DXj4E+34eR4lmCkvfchKD75W187acZzQkKPguL29iROch+yHH99rM9QfFcNHwvU1HxGcswEdRz/d5cDkIDw/XSNQsOWC39jOy0gWLSQKb1rRwi1ouZRna/tDeSVqOIRP5evP2q46BcC0q0vvXIelFBmW4pGUFfSdD8XlceBX5xQWYq4f6KTpgdQ75yDgqeSyjbkIa/tNJLQ+kR0t4LbV6Qv201DZfdV/Y/V3TDpy0vIyhoOLZ5KRdFM0Hb661Z8JTqFoImNUr7dvZIvTULnlJdKMglZRNBRtTujzBfRpDLQa6BuSjyX++stm7BU6obq5wixwwD3XDQNLMpa++otXrBU6oLKlba92BT5DzSzF5CUPicJM5F9hFKGFVCF1rnjkQe+/hBj44jSKtQk/3e5sorFzy8Otuc3PRCucFzEEDKtbFtp34FQcqnnMUI2qqbXraf+hUEeUduiGg/0AgjyBb4aoJcbNgU7Bpb5CcoJnOhrQryHlzysbnGudG2dbXfi1WvLk7N1pCfcqjA3q6+87kFqXC07EeDTtXUrMKuXuxCWxGkgsYSjJHDNua7NR18M/Uso9aFNiJoPiX10wkXJ1HXFaXpPdOxJxNkJxK+Pw/akY4jJZpuaN/NC11oe4LCzBK1I22Fuam8HwHIXeiWqqU2s7j848bNrg93yUc5d/aIwF1TgupvZonyT9h6gjwUZGZzjA2vHYPobRdqCpo19IZkdAhtRYiHenEe1trHT5SDglnIrl5+cwQlVyOEyGxmUcGrnYCFadppCRzqqM/bfs4dTex++Q7LikaQfw3HPcGnGXMTO81svVBX8KYSacUjtJklyCJO07wXi0rVQKqbF9nM4mPBx1H00ZibldYz9GTjoOj4uJ8KOisK0lE02UmEz0OnCjLrn0upv4hzmXPdwEO3kYOu/aX0+WXf6fzN7GR+/66LD8aGNaN9XxO72V5K/ryrx6no/30v9sgVZU+4o2DRiLHCeVePU4v/9V18ZZ48grygh2qFJ9xS8H55IAdtP+/agXa0GPRZDQkq6MUKprS7I2g2IXW+hFqY0DgIJ6id92JzsqvBp2aZHC01UIRT2n0348fOuvqcInvKmgUNaEr75QXJVBcKEss6a6esWVC0uigHCWWd5RnrFpStzn8qVvFisiesXvCU6uSgIAAFAZ5S0HEZ6DkFHdO/ByerW1C8OrF5aeZsNQuKV0dBRYdSUP5Y5qDswezF2uFgQY8/9jmaliKoSW0NCTo09xbTjqBje+9iGhI0rZVrjIYEjX+ay03NCEovQz03NzUkaLm60Hzj3KbXhiC/Qsw9Dow+fd6zh6ASTQgaG5FfyutCZvpauSc9J9CCIBspKggk+7X2G+TOoS1BemEpnZsOojlBOtxnOrW1l+vmt+72UeEsNmxgbqnLecgJ2rLbZ5Z8lro2nLwyYoKK92oklLi3j3oIn0BMUOluH78XbiVu4v2Vp3B2BM12V8Z7nFxuOjFPCwka7qpot4/rx1dbmdP0YoJ0+W4f18IWflz0nDvXOH0c5A3F3Zie4sYF2EmcLiga7QTpx2Yem6LOQlpQdrePCvYPTPXbaLGz+tccSWdqCVKMnv+xJcxf5s3XHEmXVecjJ1YQfNCx+N7xNCFo/r2Wno8JCRp3vKj8ZDUpqClkBHV2/JMcCC1yT6uICHK/eARMNZpqSwmEphruQ47mfs/qVk6LoKdBQpD7xSyZydimilsr8/hxds9hIn62VtxamZrHVam4tTI1j6tScWtlah5XpeLWytQ8rkrFrZWpeVyVilsrU/O4KhW3VqbmcVUqbq1MzeO+DBQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAggImh8Qo2ee3RlP7bxCh4Q+HWBGT5+7P4BmhKC7pf+zjtwRcMKoxs2dENPUD5+w5ZvfR3bftqxR0KQWSqcWmNlGJeB4h+k38cHEJR6xhtgHnjmryeJXA4qCA8sqPv2NxDU4cAoCbIkcoKu+F+sQw77W0M56PoHzHe3X/99xzkxgZgg/HT6Bi96aBtA0Of78P1rtqJuWM9U8nsx1pASdCvpNe6X/N0PSyRQBJmzZaPVBGpBslpDSFDB6oaxWLaNjbmjSNC0gySBSc/5MklkBHWFLR7c2LRSBd9YPg2b2NmZqkUEdfiejJqCsAcRVFKPWfjVUBP7+FEQP8ONByuysuWy3x9yXT5Jj7ms5FxrSAiamgbow69FjQfnoJJ6bgVTnwScrAIoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFASgIAAFASgIQEEACgJQEICCABQEoCAABQEoCEBBgCcR9PH7rqUZFXgOQZ/v+9auVOApBN0yPzVNmoYFjeuehpebetu5+qkCzyBI714eVgEKAlAQgIIAFARoWtCbRr9kQJ6GBQ0bFe4XRUFJhs2Ef7KJNQ4FASgIQEEACgJQEICCABQEoCAABQEoCEBBAAoCUBCAggAUBKAgAAUBKAhAQQAKAlAQgIIAFAT4H2AdnroI4ug3AAAAAElFTkSuQmCC" /><!-- --></p>
+<p>Graficamos el segundo conjunto de variables canónicas</p>
+<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAS1BMVEUAAAAAADoAAGYAOpAAZrY6AAA6ADo6AGY6kNtmAABmADpmtrZmtv+QOgCQ2/+2ZgC2/7a2///bkDrb////tmb/25D//7b//9v///+v8YZIAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAKr0lEQVR4nO2dgZrbphKFaZO02TYbNxtnl/d/0tqSgEECDoOQLSnnfPf6bqxhQL+HGSRhX2OposyzB7B3ERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAREQEAEBERAQAQEREBABAXUGZA6jZwHq4KJ+8Gt66W74KHemi5eqbvoaPsid6eOmsp+ehg9yR0BVDgio7IE5qOiCVWwPIiCgkwNaPw3PDahDIj81oB5LgXMCmmaWANQ8104JyFg5u+J/tfjqa/gUdwnfxqZINTrrafgUdwnfcmYRUMK3EYnnOID0N+qaerGejyMU/mzw1dfwKe7m3u8fwIhpmmKsYssejH81HliDm+6GT3GX6kEAsj6W9G66Gz7FXbIHzyaganHT2/Ap7tJd+CK/4prsxICmVC1em5x0N3yKu2I/ZkUAnR3QtEJcse76PQAVTcrwfntAaPodFVDtpKk7/4LFQQHVp92qGXQ6QMqr8wKkswCanaIOUDHczpGD5mehAgSMz1DFlqeoWfqtuFumabcvQJr7O4cC1HZHEZ1iwp1xN4KsLtwyffc03MJd+RQTR90doOFW66o7vMcAVJxRqQk4va6On8MAwq68w3B/fjbL1njvafhwdzEgf3/j9IAyuTyVkG3MZ2zrZ9guAb3dRvht+OPPH23uzBgBc7vk2QpoPvv48NllDnr747t9f/ls2wEZ8Z9Fs2jJ6J+eTnPJR54nVBeH+YF0Nrzp4/Xr8Prp50aAZlBkoITIEy3nPBRRtQmg95dhetnLp59bAPJTb8ozYSoa65c98jnYnIdmbb1hBN10+dwx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" /><!-- --></p>
+</div>
+<div id="ejemplo-2-datos-reales" class="section level3">
+<h3>Ejemplo 2 (datos reales)</h3>
+<p>Una vez analizado el proceso, podemos hacer uso de las distintas librerías disponibles en R, para este ejemplo utilizamos las librerías <em>candisc, ggplot2, GGally y CCA</em>.</p>
+<p>Cargamos los datos de una base real y los estandarizamos al igual que en el ejemplo pasado</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">datos &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;CCAData/DATABASE.csv&quot;</span>)
+datos$Money &lt;-<span class="st"> </span><span class="kw">as.numeric</span>(datos$Money)
+datos &lt;-<span class="st"> </span><span class="kw">sweep</span>(datos, <span class="dv">2</span>, <span class="kw">sqrt</span>(<span class="kw">apply</span>(datos,<span class="dv">2</span>,var)), <span class="dt">FUN=</span><span class="st">&quot;/&quot;</span>)
+
+levels &lt;-<span class="st"> </span>datos[<span class="dv">1</span>:<span class="dv">3</span>]
+cont &lt;-<span class="st"> </span>datos[<span class="dv">4</span>:<span class="dv">6</span>]</code></pre></div>
+<p>Podemos realizar un primer análisis exploratorio de los datos <img src="data:image/png;base64,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" /><!-- --><img src="data:image/png;base64,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" /><!-- --></p>
+<p>Observamos la matriz de correlaciones de ambos conjuntos de datos</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">CCA::<span class="kw">matcor</span>(levels, cont)</code></pre></div>
+<pre><code>## $Xcor
+##                  Currency        Type International
+## Currency       1.00000000 -0.01959241    0.06428801
+## Type          -0.01959241  1.00000000    0.02551863
+## International  0.06428801  0.02551863    1.00000000
+## 
+## $Ycor
+##              Anticipation       Money    Quantity
+## Anticipation   1.00000000 -0.01526986 -0.14426207
+## Money         -0.01526986  1.00000000  0.06786648
+## Quantity      -0.14426207  0.06786648  1.00000000
+## 
+## $XYcor
+##                  Currency        Type International Anticipation
+## Currency       1.00000000 -0.01959241   0.064288012 -0.016174310
+## Type          -0.01959241  1.00000000   0.025518634  0.053864694
+## International  0.06428801  0.02551863   1.000000000 -0.007010227
+## Anticipation  -0.01617431  0.05386469  -0.007010227  1.000000000
+## Money          0.06488319 -0.04532069  -0.050314891 -0.015269855
+## Quantity      -0.16886756  0.19334656  -0.260618345 -0.144262070
+##                     Money    Quantity
+## Currency       0.06488319 -0.16886756
+## Type          -0.04532069  0.19334656
+## International -0.05031489 -0.26061834
+## Anticipation  -0.01526986 -0.14426207
+## Money          1.00000000  0.06786648
+## Quantity       0.06786648  1.00000000</code></pre>
+<p>Ahora, podemos analizar las correlaciones canónicas y mostramos los coeficientes canónicos <em>raw</em></p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cc1 &lt;-<span class="st"> </span>candisc::<span class="kw">cancor</span>(levels,cont, <span class="dt">set.names =</span> <span class="kw">c</span>(<span class="st">&quot;Behavioural&quot;</span>,<span class="st">&quot;Financial&quot;</span>))
+cc2 &lt;-<span class="st"> </span>CCA::<span class="kw">cc</span>(levels,cont)
+
+<span class="kw">zapsmall</span>(<span class="kw">cor</span>(candisc::<span class="kw">scores</span>(cc1, <span class="dt">type=</span><span class="st">&quot;x&quot;</span>), candisc::<span class="kw">scores</span>(cc1, <span class="dt">type=</span><span class="st">&quot;y&quot;</span>)))</code></pre></div>
+<pre><code>##           Ycan1     Ycan2    Ycan3
+## Xcan1 0.3750804 0.0000000 0.000000
+## Xcan2 0.0000000 0.0958265 0.000000
+## Xcan3 0.0000000 0.0000000 0.027855</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(cc1, <span class="dt">type=</span><span class="st">&quot;both&quot;</span>)</code></pre></div>
+<pre><code>## [[1]]
+##                    Xcan1      Xcan2      Xcan3
+## Currency      -0.4291964  0.5828943 -0.6932747
+## Type           0.5779512 -0.3908118 -0.7171776
+## International -0.6743302 -0.7341332 -0.1058357
+## 
+## [[2]]
+##                   Ycan1       Ycan2       Ycan3
+## Anticipation  0.2572664 -0.23797653 -0.94787473
+## Money        -0.1178852  0.95579176 -0.27789085
+## Quantity      1.0048153  0.08169761  0.09717729</code></pre>
+<p>Los coeficientes anteriores se pueden entender de una manera similar a como usualmente interpretamos los coeficientes de regresión, ya que por ejemplo para la variable <em>Money</em>, un aumento en una unidad representa una disminución de <em>0.06751989</em> en la primera variable canónica del set 2, asumiendo que las demás variables se mantienen constantes.</p>
+<p>También podemos obtener los loadings canónicos para el análisis, estos loadings son las correlaciones entre las variables y las variables canónicas.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cc3 &lt;-<span class="st"> </span><span class="kw">comput</span>(levels, cont, cc2)
+
+cc3[<span class="dv">3</span>:<span class="dv">6</span>]</code></pre></div>
+<pre><code>## $corr.X.xscores
+##                     [,1]       [,2]       [,3]
+## Currency      -0.4838712  0.5433553 -0.6860275
+## Type           0.5691522 -0.4209662 -0.7062955
+## International -0.6871739 -0.7066330 -0.1687063
+## 
+## $corr.Y.xscores
+##                     [,1]        [,2]         [,3]
+## Anticipation  0.04280033 -0.02533243 -0.026675380
+## Money        -0.02011192  0.09246973 -0.007153781
+## Quantity      0.35996503  0.01733452  0.005990508
+## 
+## $corr.X.yscores
+##                     [,1]        [,2]        [,3]
+## Currency      -0.1814906  0.05206785 -0.01910932
+## Type           0.2134778 -0.04033972 -0.01967388
+## International -0.2577454 -0.06771418 -0.00469932
+## 
+## $corr.Y.yscores
+##                    [,1]       [,2]       [,3]
+## Anticipation  0.1141097 -0.2643572 -0.9576504
+## Money        -0.0536203  0.9649702 -0.2568219
+## Quantity      0.9597011  0.1808948  0.2150602</code></pre>
+<p>En general, el número de dimensiones canónicas es igual al número de variables en el conjunto más pequeño; sin embargo en la realidad este número puede ser aún menor. Las variables canónicas son el simil de los factores que se obtienen al realizar un <em>factor analysis</em>.</p>
+<p>En este ejemplo en particular tenemos 3 dimensiones canónicas de las cuales 2 son estadísticamente significativas a un nivel de significancia del 5% como lo podemos apreciar en la prueba de Wilks.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">Wilks</span>(cc1)</code></pre></div>
+<pre><code>## 
+## Test of H0: The canonical correlations in the 
+## current row and all that follow are zero
+## 
+##      CanR  WilksL       F df1    df2  p.value
+## 1 0.37508 0.85076 45.2505   9 5931.2 0.000000
+## 2 0.09583 0.99005  6.1111   4 4876.0 0.000067
+## 3 0.02786 0.99922  1.8939   1 2439.0 0.168889</code></pre>
+<p>Como la prueba misma lo indica, el primer test prueba la significancia de las 3 dimensiones en conjunto, el segundo prueba la significancia de las dimensiones 2 y 3 en conjunto y finalmente el útlimo prueba la significancia de la dimensión 3 sóla.</p>
+<p>De lo anterior podemos concluir que las dimensiones 1 y 2 son relevantes mientras que la 3 no lo es.</p>
+<p>Cuando las variables en el modelo tienen desviaciones estandar muy distintas, los coeficientes estandarizados permiten realizar comparaciones entre las variables de manera más sencilla.</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">coef</span>(cc1, <span class="dt">type=</span><span class="st">&quot;both&quot;</span>, <span class="dt">standardize=</span><span class="ot">TRUE</span>)</code></pre></div>
+<pre><code>## [[1]]
+##                    Xcan1      Xcan2      Xcan3
+## Currency      -0.4291964  0.5828943 -0.6932747
+## Type           0.5779512 -0.3908118 -0.7171776
+## International -0.6743302 -0.7341332 -0.1058357
+## 
+## [[2]]
+##                   Ycan1       Ycan2       Ycan3
+## Anticipation  0.2572664 -0.23797653 -0.94787473
+## Money        -0.1178852  0.95579176 -0.27789085
+## Quantity      1.0048153  0.08169761  0.09717729</code></pre>
+<p>Los coeficientes anteriores se interpretan de manera similar a los coeficientes <em>raw</em> con una diferencia en las unidades, por ejemplo, para la variable <em>Money</em>, un aumento de una desviación estandar implica una disminución de <em>.06751989</em> en la desviación estandar de la primera variable canónica para el set 2, siempre y cuando las demás variables se mantengan constantes.</p>
+</div>
+</div>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
