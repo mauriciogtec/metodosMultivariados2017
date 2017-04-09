@@ -15,6 +15,9 @@ Imports:
 Suggests:
     ggplot2 (>= 2.2.0),
     RCurl,
+	GGally,
+	candisc,
+	CCA,
     lubridate,
     FactoMineR (>= 1.33),
     factoextra (>= 1.0.3),
