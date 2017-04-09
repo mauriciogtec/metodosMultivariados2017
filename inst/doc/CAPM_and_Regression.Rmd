@@ -1,10 +1,10 @@
 ---
-title: "CAPM and Regression"
+title: "PCA and linear regression"
 author: "Michelle Audirac"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{CAPM_and_Regression}
+  %\VignetteIndexEntry{PCA and linear regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
