@@ -1,0 +1,311 @@
+---
+title: "FAMD"
+author: "Amaury Gutierrez, Roberto Sanchez, Thalia Guerra"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{FAMD}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r echo=FALSE}
+
+library(knitr)
+
+```
+
+## Introducción
+
+El análisis factorial mixto (Factor Analysis of Mixed Data - FAMD) se utiliza cuando un conjunto de observaciones se pueden distinguir de acuerdo a variables tanto cualitativas como cuantitativas. En general el FAMD funciona como un Análisis de Componentes Principal (PCA) para las variables cuantitativas y como un Análisis de Correspondencia Múltiple (MCA) para las variables cualitativas.
+
+Es posible realizar transformaciones de las variables cualitativas para incluirlas en el PCA (representando cada categoría mediante el centro de gravedad de las observaciones que cuentan con dicha categoría) o de las variables cuantitativas para incluirlas en el MCA (mediante los coeficientes de correlación de las variables cualitativas con las observaciones). A pesar de que las dos son posibles, es más común discretizar (o categorizar) variables cuantitativas y aplicar MCA. Sin embargo, esta práctica tiene dos limitaciones:
+
++ Contar con pocas observaciones, ya que el MCA se vuelve inestable.
++ Contar con muchas variables cuantitativas, ya que categorizarlas en una variable cualitativa única no permite capturar toda la información.
+
+
+## Breve descripción del proceso de FAMD
+
+Supongamos una matriz $Z$ de dimensiones $(n x p)$ que contiene datos de $p$ variables para $n$ individuos. $p_1$ variables son cuantitativas y $p_2$ variables son cualitativas.
+
+Los pasos para realizar FAMD son:
+
+1. Construir la matriz $Z = [Z_1, Z_2]$ donde $Z_1$ es la versión estandarizada de las variables cuantitativas (como en PCA) y $Z_2$ es la versión centrada de la matriz indicadora de las variables cualitativas (con niveles de cada categoría codificados como variables binarias como en MCA).
+
+2. Construir la matriz diagonal $N$ de los pesos de las filas de $Z$. Las filas se ponderan por $\frac{1}{n}$ tal que $N= \frac{1}{n}\|_n$.
+
+3. Construir la matriz diagonal $M$ de los pesos de las columnas de $Z$. Las columnas cuantitativas se pesan por $1$ coo en PCA y las columnas cuantitativas se pesan por $\frac{n}{n_s}$ como en MCA.
+
+4. Aplicar Descomposición de Valores Singulares Generalizada
+
+$$Z = U\Lambda V^T$$
+
+5. Los scores de factores para las filas se definen como:
+
+$$F=ZMV$$
+
+o se puede extraer de la descomposición de valores singulares generalizada como:
+
+$$F=U\Lambda$$
+
+6. Los scores de factores para las columnas se definen como:
+
+$$A^* = MV\Lambda$$
+
+donde la matriz $A^*$ se divide en:
+
+$A^*_1$ que contiene los factores para las variables cuantitativas y 
+$A^*_2$ que contiene los factores para los *m* niveles obtenidos de las variables cualitativas.
+
+
+## Aplicaciones
+
+#### Paquetes
+
+Para realizar FAMD se pueden utilizar distintos paquetes:
+
+- **PCAmixdata**, que incluye la función **MFAmix**. 
+- **FactoMineR**, que incluye la función **FAMD**.
+
+```{r}
+
+library(PCAmixdata)
+
+```
+
+
+#### Ejemplo 1: Análisis Factorial Mixto
+
+Para ejemplificar el análisis factorial mixto se va a usar la base **Cars93** del paquete **MASS**, que contiene información de 93 coches que se vendían en EEUU en 1993. Los datos tienen las siguientes variables:
+
+```{r}
+
+library(MASS)
+
+data <- MASS::Cars93
+
+colnames(data)
+
+```
+
+
+```{r}
+
+grupos <- c(1:25)
+
+nombres_grupos <- c('Type', 'Min_price', 'Price', 'Max_price', 'MPG_city', 'MPG_Highway', 'Airbags', 'Drivetrain', 'Cyinders', 'Engine_size', 'Horsepower', 'RPM', 'Rev_per_mile', 'Man_trans_avail', 'Fuel_tank_capacity', 'Passengers', 'Length', 'Wheelbase', 'Width', 'Turn_circle', 'Rear_seat_room', 'Luggage_room', 'Weight', 'Origin', 'Make')
+
+res <- MFAmix(data=data[ , c(3:27)],groups=grupos,
+              name.groups=nombres_grupos, rename.level=TRUE, ndim=2, graph = FALSE)
+```
+
+
+```{r}
+
+summary(res)
+print(res)
+
+```
+
+##### Algunos resultados importantes del análisis:
+
+Matriz de relaciones entre las variables (Lg coefficients):
+
+```{r, echo = FALSE}
+
+kable(res$groups[1])
+
+```
+
+
+```{r}
+
+res <- MFAmix(data=data[ , c(3:27)],groups=grupos,
+              name.groups=nombres_grupos, rename.level=TRUE, ndim=2)
+
+```
+
+
+##### Interpretación de los resultados más importantes del paquete:
+
+**Individuals Component Map**
+
+Es un mapeo de los scores de los factores para las observaciones. Permite ubicar las observaciones dentro de cada componente. Sin embargo, es de dificil interpretación cuando las observaciones no están nombradas.
+
+**Levels Component Map**
+
+Es un mapeo de los scores de los factores para los niveles (categorías de las variables cualitativas). Permite ubicar las categorías dentro de cada uno de los componentes y, de esta manera, identificar relaciones entre categorías de distintas variables. Sin embargo, contar con muchas categorías dificulta su interpretación.
+
+**Correlation Circle**
+
+Es un mapeo de los scores de los factores para las variables cuantitativas. Muestra la correlación que hay entre éstas así como con cada uno de los dos principales componentes.
+
+En este ejempo se puede ver a) que el precio tiene una alta correlación con los caballos de fuerza de los coches y b) que la capacidad del tanque tiene una alta relación con el tamaño del coche y variables relacionadas con el mismo.
+
+**Squared Loadings** 
+
+Cuando las variables son cuantitativas se refiere a $r^2(f_i,x_j)$ y cuando las variables son cualitativas se refiere a $\eta^2(f_i \mid x_j)$.
+
+En esta gráfica se representa la relación entre la variable y los componentes. La relación va de (0,1) con cada uno de los componentes.
+
+En este ejemplo podemos ver que la variable *make*, que indica que empresa manufactura el coche, es la más correlacionada con los dos componentes.
+
+**Groups Contributions**
+
+Muestra la contribución de cada grupo, en caso de definirse, a cada uno de los dos componentes principales.
+
+En este ejemplo no hay grupos definidos, por lo que muestra la contribución de cada variable a cada uno de los componentes. Una vez más se puede ver que la variable *make* es la que más contribuye a los dos componentes principales.
+
+#### Ejemplo 2: Análisis Factorial Mixto Múltiple
+
+El análisis factorial mixto mútiple permite realizar un análisis factorial mixto para grupos de variables identificados previamente. 
+
+En este ejemplo se va a utilizar la base **gironde** del paquete **MFAmixdata** que contiene variables pertenecientes a cuatro grupos:
+
+```{r}
+
+data(gironde)
+
+colnames(gironde$employment)
+colnames(gironde$housing)
+colnames(gironde$services)
+colnames(gironde$environment)
+
+```
+
+
+```{r}
+
+class.var <- c(rep(1,9),rep(2,5),rep(3,9),rep(4,4))
+names <- c("employment","housing","services","environment")
+
+dat <- cbind(gironde$employment[1:20, ],gironde$housing[1:20, ],
+             gironde$services[1:20, ],gironde$environment[1:20, ])
+
+res <- MFAmix(data=dat,groups=class.var,
+              name.groups=names, rename.level=TRUE, ndim=2, graph = FALSE)
+
+```
+
+##### Resultados:
+
+Matriz de relaciones entre las variables (Lg coefficients):
+
+```{r, echo = FALSE}
+
+kable(res$groups[1])
+
+```
+
+```{r}
+
+res <- MFAmix(data=dat,groups=class.var,
+              name.groups=names, rename.level=TRUE, ndim=2)
+
+```
+
+##### Interpretación de los resultados más importantes del paquete:
+
+**Individuals Component Map**
+
+En este ejemplo es posible ubicar las observaciones en los dos principales componentes.
+
+**Levels Component Map**
+
+En esta gráfica es posible ver, por ejemplo, que las ciudades en las que hay menos casas son también en las que hay más servicos.
+
+**Correlation Circle**
+
+Es posible ver que las variables *owners* y *farmers* están correlacionadas, al igual que *trade* y *managers*.
+
+**Squared Loadings** 
+
+En este ejemplo podemos ver que las variables *agriculture*, *building* y *density*están altamente relacionadas con el componente 1, mientras que las variables *employed* y *vegetation* están relacionadas con el componente 2. Las variables del grupo *services* son las menos relacionadas con los componentes.
+
+**Groups Contributions**
+
+En este ejemplo se ve que los cuatro grupos de variables contribuyen de manera muy similar a ambos componentes. 
+
+Con los resultados que se pueden observar en las 5 gráficas más importantes que se obtienen del paquete es posible identificar grupos y patrones de comportamiento de las ciudades incluidas en esta base de datos.
+
+#### Ejemplo 3: Vulnerabilidad y Amenazas Municipal
+
+```{r}
+municipal <- read.csv("https://s3-us-west-2.amazonaws.com/proyecto-sdv/amenazas_vulnerabilidad.csv")
+names <- c("vulnerabilidad","amenazas")
+class.var <- c(rep(1,8),rep(2,4))
+colnames(municipal)
+dat <- cbind(municipal[,3:10],municipal[,11:14])
+row.names(dat) <- municipal$cve_muni
+
+res <- MFAmix(data=dat,groups=class.var,
+              name.groups=names, rename.level=TRUE, ndim=2, graph = TRUE)
+
+
+```
+
+##### Interpretación de los resultados más importantes del paquete:
+
+**Individuals Component Map**
+
+Debido a la cantidad de observaciones no es posible identificar a los municipios en esta gráfica.
+
+**Levels Component Map**
+
+En esta gráfica se puede identificar que altas nevadas están correlacionadas con temperaturas altas, por lo que se puede pensar que corresponde a municipios en los que hay temperaturas extremas. Igualmente se puede ver que bajo nivel de inundaciones tiene una alta relación con un alto nivel de sequías. Esto puede ser un indicio de la posibilidad de usar variables relacionadas con el clima del municipio como un sustituto de las variables que indican las distintas amenazas.
+
+**Correlation Circle**
+
+Todas las variables relacionadas al grupo de *vulnerabilidad* están altamente correlacionadas.
+
+**Squared Loadings** 
+
+En este ejemplo podemos ver que las variables del grupo *vulnerabilidad* están relacionadas con el componente 1 mientras que las del grupo *amenazas* están reacionadas con el componente 2.
+
+**Groups Contributions**
+
+Esta gráfica nos da prácticamente la misma información que la gráfica de **squared loadings**.
+
+```{r}
+municipal <- read.csv("https://s3-us-west-2.amazonaws.com/proyecto-sdv/amenazas_vulnerabilidad.csv")
+names <- c("vulnerabilidad","amenazas","entidad")
+class.var <- c(rep(1,8),rep(2,4),rep(3,1))
+colnames(municipal)
+dat <- cbind(municipal[,3:10],municipal[,11:14],municipal$nom_ent)
+dat$nom_ent <- dat$`municipal$nom_ent`
+dat$`municipal$nom_ent`<- NULL
+row.names(dat) <- municipal$cve_muni
+
+res <- MFAmix(data=dat,groups=class.var,
+              name.groups=names, rename.level=TRUE, ndim=2, graph = TRUE)
+
+```
+
+##### Interpretación de los resultados más importantes del paquete:
+
+**Individuals Component Map**
+
+No es posible identificar a los municipios en esta gráfica. Sin embargo, vale la pena resaltar que al agregar la variable de entidad como un nuevo grupo se modifica de manera sustancial la ubicación de los municipios dentro de cada uno de los componentes.
+
+**Levels Component Map**
+
+A pesar de que la gráfica no es muy clara, nos indica a qué estados corresponden las temperaturas extremas identificadas. Sin embargo podemos ver también que no se puede resumir con la variable de entidad.
+
+**Correlation Circle**
+
+Todas las variables relacionadas al grupo de *vulnerabilidad* están altamente correlacionadas.
+
+**Squared Loadings** 
+
+En este ejemplo podemos ver que las variables del grupo *vulnerabilidad* están relacionadas con el componente 1 mientras que las del grupo *amenazas* están medianamente relacionadas con ambos componentes y la *entidad* esta altamente relacionada con ambos componentes.
+
+**Groups Contributions**
+
+De esta gráfica no es posible extraer más información que de la gráfica de **squared loadings**.
+
+#### Conclusiones del Método
+
+En general, este método es bueno para hacer asociaciones grupales o de valores específicos de variables. Sin embargo, se pierde la capacidad de resumir variables que tienen PCA y MCA.
+
+[FUENTE](https://arxiv.org/pdf/1411.4911.pdf)
