@@ -9,7 +9,11 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-Assuming $X_i$ and $X_j$ have mean 0 we can compute the empirical Covariance between $X_i$ and $X_j$ using $\mathrm{\hat{Cov}}(X_i, X_j)=\big(\frac{1}{n}\big)X_i^TX_j$. Let's denote with $\hat\Sigma$ the empirical Covariance Matrix of all the $X_i$'s. It follows that
+##An Intuitive Interpretation of $\hat\beta$
+
+In this vignette we will derive an intuitive interpretation for one of the most basic solutions coming from linear regression, that is, we will derive an intuitive interpretation for $\hat\beta$. We should begin by stating that $\hat\beta = (X^TX)^{-1}X^TY$. The question here is, what is $(X^TX)^{-1}X^TY$?
+
+Assuming $X_i$ and $X_j$ are $n$-dimensional vectors with mean 0 we can compute the empirical Covariance between $X_i$ and $X_j$ using $\mathrm{\hat{Cov}}(X_i, X_j)=\big(\frac{1}{n}\big)X_i^TX_j$. Let's denote with $\hat\Sigma$ the empirical Covariance Matrix of $X = (X_1| X_2|\dots|X_p)$. It follows that
 
 \begin{equation}
 \hat\Sigma
@@ -19,7 +23,7 @@ Assuming $X_i$ and $X_j$ have mean 0 we can compute the empirical Covariance bet
 = \Big(\frac{1}{n}\Big) \begin{pmatrix}
 X_1^TX_1 & X_1^TX_2 & \ldots &X_1^TX_p \\
 \vdots & \vdots & \ddots & \vdots \\
-X_p^TX_1 & X_p^TX_2 & \ldots &X_p^TX_n
+X_p^TX_1 & X_p^TX_2 & \ldots &X_p^TX_p
 \end{pmatrix}
 
 \end{equation} 
@@ -60,7 +64,7 @@ Let's continue finding out how $\hat\beta$ relates with Precision Matrix. First 
 
 We will arrive to very similar conclusions for the case where $X_i$'s do co-vary with each other. To do this, we will use the eigendecomposition of $\hat\Sigma$. 
 
-Provided $PDP^T$, the eigendecomposition of $\hat\Sigma$, we know that $P$'s colums are the eigenvectors (loadings?) $P_1, P_2,\ldots, P_p$ of $\hat\Sigma$ and that the diagonal of $D$ has the eigenvalues of $\hat\Sigma$. We also know that the columns of $XP$ are a set of transformed observations $XP_1, XP_2,\ldots, XP_p$ called principal components. Since
+Provided $PDP^T$, the eigendecomposition of $\hat\Sigma$, we know that $P$'s colums are the eigenvectors $P_1, P_2,\ldots, P_p$ of $\hat\Sigma$ and that the diagonal of $D$ has the eigenvalues of $\hat\Sigma$. We also know that the columns of $XP$ are a set of transformed observations $XP_1, XP_2,\ldots, XP_p$ called principal components. Since
 \begin{equation}
 \mathrm{PDP^T}=\hat\Sigma=\frac{1}{n}X^TX
 \end{equation}
@@ -87,36 +91,24 @@ In consequence, it is very nice to see that each transformed $\hat\beta_i$, give
 
 
 ## Example
+We will now take the theory shared and prove the results using code and data. In this example we will use financial time series. 
 
-Load required packages
+First, let's load required packages. To do this we will use functions `load.packages` and `strspl` functions from `metodosMultivariados2017` package.
 ```{r, warning = FALSE, message = FALSE}
-library(RCurl)
-library(lubridate)
-library(xts)
-library(dplyr)
-library(tidyr)
-library(plotly)
+library("metodosMultivariados2017")
+
+load.packages(strspl("RCurl, 
+                     lubridate, 
+                     xts, 
+                     dplyr, 
+                     tidyr, 
+                     plotly"))
 ```
 
-Load functions
-```{r}
-script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_prices.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
+Next we will fetch prices from `yahoo.finance.com`. To do this we will use function `get_prices_yahoo` from `metodosMultivariados2017` package.
 
-script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_decay.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
-
-script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/utils.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
-
-script <- getURL("https://raw.githubusercontent.com/audiracmichelle/work-in-process/master/michelle/get_returns.R", ssl.verifypeer = FALSE)
-eval(parse(text = script))
-
-remove("script")
-```
-
-Fetch prices from yahoo.finance.com
-```{r}
+In this example we will get prices for ETFs that follow the S&P500 and Industry Sectors. Industry names are listed within the code below.
+```{r, warning = FALSE, message =  FALSE}
 yahoo_id <- c(
   "SPY",
   "IYK", #Consumer Goods
@@ -136,67 +128,87 @@ price <- get_prices_yahoo(yahoo_id, "2010-01-01")
 
 ```
 
-Get returns (daily price changes)
+From prices, let's compute the returns of the ETFs and plot their daily changes. 
+
+We use functions `get_returns` and `plot_returns` from package `metodosMultivariados2017`.
 ```{r, fig.width = 7}
-returns <- get_returns_rollapply(price)
+returns <- get_returns(price)
 
-plot_returns(returns["2016/", 1:5])
-
-cum_return <- get_returns_rollapply(price["2016/", ], is_cumulative = TRUE)
+plot_returns(returns["2016/", ])
 ```
 
+If we acumulate the daily changes, we get the cumulative returns which are plotted below. If we had invested in the S&P500 at the beginning of 2016 we would have 20% of effective return.
 ```{r, fig.width = 7}
-plot_returns(cum_return[, 1:5])
+cum_return <- get_returns(price["2016/", ], is_cumulative = TRUE)
+
+plot_returns(cum_return[, ])
 ```
 
-Provide a linear model of two sectors and another one with all sectors 
+We will now get a linear model that tries to explain the S&P500 with only two sectors. The $\beta$ is printed
 ```{r}
 model = lm(SPY ~ -1 + IYK + IYC, data = returns)
 model$coefficients
+```
 
+Let's do the same for all sectors. The $\beta$ is printed as well. 
+
+We can see how the $\beta$ coefficients for `IYK` and `IYC` changed after we included more variables to the model. 
+```{r}
 model = lm(SPY ~ -1 + IYK + IYC + IYE + IYF + IYJ + IYM + IDU + IYH + IYW + IYZ + IYR, data = returns)
 model$coefficients
 
 beta <- model$coefficients
 ```
 
-Get loadings (eigenvectors) and eigenvalues
+It is time to see what happens if we use principal components.
+
+First we have to get the loadings (eigenvectors) and eigenvalues.
 ```{r, fig.width = 7}
 X <- returns[, -1]
 Y <- returns[, 1]
 
 cov_X <- cov(X, use = "pairwise.complete.obs")
 P <- eigen(cov_X)$vectors
-colnames(P) <- yahoo_id[-1]
+colnames(P) <- paste("PC", 1:ncol(P), sep = "")
 d <- eigen(cov_X)$values
+```
 
+When we plot the returns of the principal components it is interesting to see how the first principal component shows the most volatility. Evidently the last principal component shows the least volatility.
+```{r, fig.width = 7}
 pp <- X %*% P
 pp <- as.xts(pp, order.by = index(returns))
 
-plot_returns(pp["2016/", 1:5])
+plot_returns(pp["2016/", ])
 ```
 
-
-Provide a linear model of two principal components and another one with all of them
+Take a look at the $\beta$ coefficients for a linear model that uses the first two principal components to explain the S&P500.
 ```{r}
 pp_returns <- data.frame(returns$SPY, pp)
 
-model = lm(SPY ~ -1 + IYK + IYC, data = pp_returns)
-model$coefficients
-
-model = lm(SPY ~ -1 + IYK + IYC + IYE + IYF + IYJ + IYM + IDU + IYH + IYW + IYZ + IYR, data = pp_returns)
+model = lm(SPY ~ -1 + PC1 + PC2, data = pp_returns)
 model$coefficients
 ```
 
-Prove result
+Do the same using all the principal components so we can verify how the $\beta$ coefficients for `PC1` and `PC2` have the same values as the 'two principal component model'.
 ```{r}
-cov_ppY <- cov(pp_returns, Y, use = "pairwise.complete.obs")
-
-cov_ppY/d
-
+model = lm(SPY ~ -1 + PC1 + PC2 + PC3 + PC4 + PC5 + PC6 + PC7 + PC8 + PC9 + PC10 + PC11, data = pp_returns)
+model$coefficients
 ```
 
-Show that the first principal component is the market
+At this point think of the transformed $\beta$ and remember how each coefficient is the empirical covariance of each principal component with the S&P500 weigthed by the precision of each principal component.
+
+To do this, let's compute the covariance of the principal components with the S&P500.
+```{r}
+cov_ppY <- cov(pp, Y, use = "pairwise.complete.obs")
+print(cov_ppY)
+```
+
+Weight those covariances by the precision of the principal components. See how we recover the $\beta$ coefficients that were computed with function `lm`.
+```{r}
+cov_ppY/d
+```
+
+Finally, a nice result is to prove that the first principal component for the industy sectors is the market (i.e. is the S&P500). To do this, we shall compute the correlation of the first principal component with the market. See how it is almost 1?
 ```{r}
 cor(pp[, 1], Y, use = "pairwise.complete.obs")
 ```
