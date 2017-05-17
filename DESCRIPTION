@@ -9,8 +9,12 @@ Depends:
     R (>= 3.2.3)
 LazyData: true
 Imports:
-    magrittr (>= 1.5)
+    magrittr (>= 1.5),
+    xts,
+    zoo,
+    lubridate
 Suggests:
+    nloptr,
     knitr (>= 1.14),
     rmarkdown (>= 1.3),
     ggplot2 (>= 2.2.0),
