@@ -15,14 +15,14 @@ La ultima clase derivamos la forma mas simple de un problema de maquinas de sopo
 
 ```{r}
 X <- data.frame(
-  x1 = c(-1, 0, -0.25, 1.5, 0.5),
-  x2 = c(-0.5, 0, 1, 2, 1)
+  x1 = c(-1, -0.25, 0.75, 0, -0.25, 1.5, 0.5, 1),
+  x2 = c(-0.5, 0.8,  1.25, 0, 1, 2, 1, 1)
 )
-y = c(-1, -1, -1, 1, 1)
+y = c(-1, -1, 1, -1, -1, 1, 1, 1)
 ```
 
 ```{r, message = FALSE, warning = FALSE, fig.width=7}
-library(ggplot2)
+require(ggplot2)
 plot_data <- data.frame(X, y = factor(y))
 p <- ggplot(plot_data, aes(x = x1, y = x2, colour = y)) +
   geom_point(size = 6, alpha = 0.3)
@@ -43,7 +43,7 @@ donde $y_i$ es el signo de clasificacion del individuos $i$ y $x_i$ es su conjun
 Para problemas sencillos podemos solucionar usando la libreria de optimizacion `nloptr` y optimizando directemante
 
 ```{r, message = FALSE, warning = FALSE}
-library(nloptr)
+require(nloptr)
 eval_f <- function(x) {
   w <- x[-length(x)]
   0.5*sum(w^2)
@@ -90,3 +90,243 @@ p <- ggplot(plot_data, aes(x = x1, y = x2, colour = y, shape = active)) +
 p
 ```
 
+En la gráfica anterior es fácil ver ilustrada la idea de "vectores soporte", que están indicados con un triangulo.
+
+## Datos linealmente inseparables 
+
+En la mayoría de los casos reales en que querramos usar métodos de predicción, será imposible separar perfectamente los puntos linealmente, sin embargo, quisiéramos encontrar de todos modos el "mejor" plano separamente en el sentido de que minimice el tamaño del error.
+
+Vamos a cambiar dos puntos de nuestros datos de ejemplo para ejemplificar este caso cuando solo hay dos variabes/features:
+
+```{r}
+X <- data.frame(
+  x1 = c(-1, -0.25, 0.75, 0, -0.25, 1.5, 0.5, 1),
+  x2 = c(-0.5, 0.8,  1.25, 0, 1, 2, 1, 1)
+)
+y = c(-1, 1, -1, -1, -1, 1, 1, 1)
+```
+
+```{r, message = FALSE, warning = FALSE, fig.width=7}
+plot_data <- data.frame(X, y = factor(y))
+p <- ggplot(plot_data, aes(x = x1, y = x2, colour = y)) +
+  geom_point(size = 6, alpha = 0.3)
+p
+```
+
+Parap poder solucionar este problema vamos a instroducir un conjunto de variables auxiliares conocidas como "variables de holgura" (*slack variables*) que representan el tamaño del error en ada dimensión. El nuevo problema de optimización queda:
+
+$$
+\begin{aligned}
+\min_{w,b} \; &\quad\quad \frac{1}{2}\lVert w \rVert^2  + C\textstyle{\sum_{i}\xi_i} & \\
+s.a. \; & \;  \begin{aligned} 
+y_i(w^\top x_i + b) & \geq 1 - \xi_i \quad & \forall i \\ 
+ \xi_i & \geq 0 \quad & \forall i
+\end{aligned}
+\end{aligned}
+$$
+donde $\xi_i$ representa el error al clasificar al individuo $i$ (de modo que $\xi_i > 0$ ocurre únicamente cuando el individuo $i$ está clasificado incorrectamente), y la constante $C > 0$ sirve para dar un castigo positivo al tamaño del error, distintos valores de $C$ pueden generar diferentes soluciones. El valor de $C$ suele escogerse a través de una técnica de validación externa conocida como validación cruzada (*cross-validation*). Para efectos prácticos, podemos poner de manera razonable un valor que corresponde con la dimensión del problema como $C := \sum_i \textrm{Var}(X^j)  = \mathrm{tr}(Var(X))$.
+
+La técnica que usamos anteriormente suele conocerse en la literatura como regularización $l_1$, pues estamos penalizando las variables de holgura linealmente (por ejemplo, si hubiésemos usado una penalización de la forma $C\sum_i \xi_i^2$, la habríamos llamado regularización $l_2$).
+
+Con esta nueva forma de modelar, podemos redefinir la función objetivo de nuestro código de optimización.
+
+```{r, message = FALSE, warning = FALSE}
+require(nloptr)
+C = sum(diag((cov(X))))
+n = ncol(X)
+m = nrow(X)
+eval_f <- function(x) {
+  w <- x[1:n]
+  b <- x[n + 1]
+  xi <- x[(n + 2):(n + 1 + m)]
+  0.5*sum(w^2) + C*sum(xi)
+}
+eval_grad_f <- function(x) {
+  w <- x[1:n]
+  b <- x[n + 1]
+  xi <- x[(n + 2):(n + 1 + m)]
+  c(w, 0, rep(C, m))
+}
+eval_g_ineq <-  function(x) {
+  w <- x[1:n]
+  b <- x[n + 1]
+  xi <- x[(n + 2):(n + 1 + m)]
+  y*(as.matrix(X)%*%w + b) - 1 + xi # default g(x) >= 0
+}
+eval_jac_g_ineq <- function(x) {
+  w <- x[1:n]
+  b <- x[n + 1]
+  xi <- x[(n + 2):(n + 1 + m)]
+  mat1 <- do.call("rbind", lapply(1:m, function(i) c(y[i] * as.numeric(X[i, ]), y[i])))
+  cbind(mat1, diag(m))
+}
+lower <- c(rep(-Inf, n + 1), rep(0, m))
+x0 = c(rep(0, n + 1), rep(100, m)) # initial guess
+res = slsqp(
+  x0 = x0,
+  fn = eval_f,
+  gr = eval_grad_f,
+  lower = lower,
+  hin = eval_g_ineq,
+  hinjac = eval_jac_g_ineq
+)
+x <- res$par
+w <- x[1:n]
+b <- x[n + 1]
+xi <- x[(n + 2):(n + 1 + m)]
+```
+
+```{r}
+w
+```
+```{r}
+b
+```
+
+
+```{r, fig.width=7}
+active = eval_g_ineq(x) < 10e-3
+ablines = data.frame(slope = -w[1]/w[2], intercept = -b / w[2], linetype = c("yi(w'*xi + b)=0"))
+plot_data <- data.frame(X, y = factor(y), active = active)
+p <- ggplot(plot_data, aes(x = x1, y = x2, colour = y, shape = active)) +
+  geom_point(size = 6, alpha = 0.3) +
+  geom_abline(data = ablines, aes(slope = slope, intercept = intercept, linetype = linetype))
+p
+```
+
+Podemos observar en la gráfica anterior como solo los puntos en los extremos están inactivos, mientras que hay un error de clasificación en el centro, así como todas esas restricciones activas.
+
+## Como clasificar un punto fuera de la muestra?
+
+El criterio de clasificación que dimos esta totalmente basado en el valor de $$w^\top x + b.$$
+Supongamos que obtenemos información de un nuevo punto $x_\text{new}$ fuera de la muestra de entrenamiento y queremos predecir si es del tipo $+1$ o $-1$. El criterio de la clasificación es
+
+$$
+\hat{y}_\text{new} = \text{pred}(x_\text{new}) = \begin{cases}
++1 && \text{ si } w^\top x + b \geq 0 \\ 
+-1 && \text{ si } w^\top x + b < 0
+\end{cases}
+$$
+
+Para ilustrarlo vamos a agregar el punto $(0.5, 1)$ a la última gráfica:
+
+```{r, fig.width=7}
+x_new <- c(0.5, 0.1)
+y_new <- sign(t(w) %*% x_new + b)
+ablines = data.frame(slope = -w[1]/w[2], intercept = -b / w[2], linetype = c("yi(w'*xi + b)=0"))
+plot_data <- data.frame(
+  rbind(X, x_new), 
+  y = factor(c(y, y_new)),
+  source = c(rep("training", nrow(X)), "new point")
+)
+p <- ggplot(plot_data, aes(x = x1, y = x2, colour = y, shape = source)) +
+  geom_point(size = 6, alpha = 0.3) +
+  geom_abline(data = ablines, aes(slope = slope, intercept = intercept))
+p
+```
+
+## Mejor resolviendo el dual: mas eficiencia y solo depende del producto punto
+
+En clase estudiamos con detalle el problema dual. El problema dual asociado al problema de máquinas de soporte vectorial es $$ \max_{\alpha, \beta \geq 0} \left( \min_{w,b,\xi} \frac{1}{2}\lVert w \rVert^2 + C\sum_i\xi_i - \sum_i\alpha_i\left(y_i(w^\top x_i + b) - 1 + \xi_i\right)  - \sum_i \beta_i\xi_i\right) $$
+
+Al resolver el subproblema de minimizacion dentro del paréntesis y simplificar las restricciones (equivalente a sustituir las condiciones de Karush Kuhn Tucker y simplificar), vimos como eliminar las $\beta$'s y llegar a una expresión muy simplificada
+
+$$
+\begin{aligned}
+\max_{\alpha}  & \; \sum_i \alpha_i - \frac{1}{2}\sum_i\sum_j y_iy_j\alpha_i\alpha_j (x_i \cdot x_j ) \\
+\text{s.a.} \; & \; \quad 0 \leq \alpha_i \leq C \quad \forall i \\
+\quad \; & \quad \sum_i\alpha_i y_i = 0 \\
+\end{aligned}
+$$
+
+El que solo dependa del producto punto es la característica más importante, pues es la que nos permitirá hacer clasficicación no lineal. 
+
+*Recordatorio*: En clase también vimos que resolver el subproblema dentro de paréntesis es equivalente a sustituir las ecuaciones resultantes de las condiciones de Karush Kuhn Tucker en la funcion de Lagrange. Las condiciones de Karush Kuhn Tucker de este problema se resumen a:
+
+* $w = \sum_i\alpha_i y_i x_i$
+* $\sum_i y_i\alpha_i = 0$ 
+* $\alpha_i(y_i(w^\top x_i + b) -1 + \xi_i) = 0$ 
+* $\beta_i\xi_i = 0$
+* $\alpha_i + \beta_i$ = C
+* $\alpha_i, \beta_i \geq 0$
+
+### El algoritmo "correcto" de optimización: SMO (sequential minimal optimization)
+
+El problema de optimización dual involucra la maximización de una función cuadrática sujeta a una restricción lineal de igualdad y restricciones de tipo caja para los valores de $\alpha$. Este es un problema de *programación cuadrática* y está muy bien estudiado. Los métodos que existen sin embargo, son iterativos y pueden ser muy costosos a gran escala.
+
+En 1998, John Platt--de Microsot Reasearch--descubrió una manera de resolver *este* problema dual de manera muy eficiente. La idea está basada en uno de los algoritmos numéricos más sencillos: el de *ascenso por coordenadas para optimización sin restricción*, y que consiste en optimizar secuencialmente la función objetvo como función de una sola variable, suponiendo las demás constantes. La ventaja del metodo de Platt es que los subproblemas se pueden resolver de manera analítica directamente sin necesidad de usar métodos aproximados iterativos.
+
+En este tutorial no usaremos el algoritmo de Plater por simplicidad, pero brevemente describiremos el proceso iterativo:
+
+1. Seleccionar arbitratiamente (con alguna heurística) una pareja de multiplicadores de lagrange $(\alpha_i, \alpha_j)$. 
+2. En el ascenso por coordenadas, se resuelve en cada paso el subproblema de optimizar en términos de una variable dejando las demás constantes. Como nosotros tenemos que garantizar la condición $\sum_i \alpha_i y_i = 0$, podemos poner $\alpha_j = (-y_i\alpha_i - K)/y_j$ donde $K = \sum_{k\neq i, j} \alpha_k$ es considerado constante. De esta manera se garantiza la restricción de igualdad. 
+3. Resolver el problema $$ \begin{aligned}
+\max_{\alpha_i} \; & f(\alpha_1,...\alpha_i,...,(-y_i\alpha_i - K)/y_j, ...)  \\
+\text{s.a.}               & \; 0 \leq \alpha_i  \leq C \\
+                   & \; 0 \leq (-y_i\alpha_i - K)/y_j \leq C
+\end{aligned}
+$$ donde $f$ es la función objetivo $$f(\alpha_1, ..., \alpha_n) = \sum_i \alpha_i - \frac{1}{2}\sum_i\sum_j y_iy_j\alpha_i\alpha_j (x_i \cdot x_j ).$$
+El problema resultante es un problema cuadrático muy sencillo de una variable enel que solo pueden suceder dos cosas: o las restricciones está inactivas y la solución se obtiene analíticamente despejando (i.e., la fórmula chicharronera), o está el alguna de los bordes de las restricción. Podemos saber en que borde dependiendo del valor de la solución sin restricción (dibujar).
+4. Regresar al paso 1 hasta que haya convergencia.
+
+### Resolviendo el dual numericamente
+
+Como nuestro problema es de juguete, no usaremos el metodo de Platt y seguiremos usando directamente la paquetería de optimización cuadrática `nloptr`. A continuación pogramamos y resolvemos el problema dual.
+
+
+```{r, message = FALSE, warning = FALSE}
+C = sum(diag((cov(X))))
+m = nrow(X)
+Q = (y * as.matrix(X)) %*% t(y * as.matrix(X)) # broadcast multiplication
+fn <- function(alpha) { # recall default is minimization
+  as.numeric(0.5 * t(alpha) %*% Q %*% alpha - sum(alpha))
+}
+gr <- function(alpha) {
+  Q %*% alpha - 1
+}
+heq <-  function(alpha) {
+  as.numeric(t(y) %*% alpha)
+}
+heqjac <- function(alpha) {
+  y
+}
+alpha0 = rep(0, m) 
+res = slsqp(
+  x0 = alpha0,
+  fn = fn,
+  gr = gr,
+  lower = rep(0, m),
+  upper = rep(C, m),
+  heq = heq,
+  heqjac = heqjac
+)
+alpha <- res$par
+alpha
+```
+
+
+
+Una vez obtenidos los multiplicadores de Lagrange, es inmediato recuperar el valor de $w$, pues una de las condiciones de Karush Kuhn Tucker es $w = \sum_i \alpha_i y_i x_i$. 
+
+```{r}
+w = apply((alpha * y)*as.matrix(X), 2, sum) 
+w
+```
+
+
+Podemos descansar en paz observando que el valor coincide con la solución del primarl.
+
+### Recuperando $b$ e interpretando el óptimo $\alpha_i^*$
+
+!Justo aquí es cuando nos acordamos que $\alpha$ es el multiplicador de Lagrande! Recordemos la condición de complementariedad de Karush Kun Tucker que dice
+$$ \lambda_i^* g_i(x^*) = 0 $$
+para toda restricción $g_i$ y el valor $\lambda_i^*$ de su correspondiente multiplicador de Lagrange. Esta condición dice que si multiplicador de Lagrange es positivo, entonces la restricción activa. 
+
+**Conclusión 1**: Si $\alpha_i > 0$ entonces $y_i(w^\top x_i + b) = 1 - \xi_i$.
+
+¿Y qué significa $\alpha_i < C$? Para contestar esta preguntar hay que recordar que al pasar al problema dual usamos las condiciones de Karush Kuhn Tucker y luego hicimos una simplifación adicional para eliminar las $\beta$'s que eran los multiplicadores de Lagrange de las restricciones $\xi_i \geq 0$. Este hecho, junto con la condición $\alpha_i + \beta_i = C$ nos dicen que estos son los casos en lo que el error es cero.
+ 
+**Conclusión 2**: Si $\alpha_i > 0$ entonces $\xi_i = 0$.
+
+
+### Clasificación no lineal
